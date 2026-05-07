@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
 import { useNavigate } from 'react-router-dom';
 import { getHealthAssistantResponse } from '../../services/geminiService';
+import { findUniversityByQuery } from '../../data/universities';
 
 interface Message {
   id: string;
@@ -37,29 +38,6 @@ You can use this prototype to:
 - Report symptoms after vaccination
 - Find emergency guidance
 - Review privacy and data safety information`;
-
-const universityVaccineLinks = [
-  { name: 'Harvard University', aliases: ['harvard'], url: 'https://huhs.harvard.edu/patients-and-visitors/medical-records-and-immunizations/immunization-compliance/' },
-  { name: 'MIT', aliases: ['mit', 'massachusetts institute of technology'], url: 'https://health.mit.edu/faqs/medical-report-immunizations' },
-  { name: 'UCLA', aliases: ['ucla', 'university of california los angeles'], url: 'https://immunizationrequirement.ucla.edu/' },
-  { name: 'USC', aliases: ['usc', 'university of southern california'], url: 'https://sites.usc.edu/new-student-health-requirements/immunizations/' },
-  { name: 'UC Irvine', aliases: ['uc irvine', 'uci', 'university of california irvine'], url: 'https://studenthealth.uci.edu/immunization-requirements/' },
-  { name: 'UC Santa Barbara', aliases: ['uc santa barbara', 'ucsb', 'university of california santa barbara'], url: 'https://studenthealth.sa.ucsb.edu/immunizations/university-immunization-requirements' },
-  { name: 'Cornell University', aliases: ['cornell'], url: 'https://health.cornell.edu/services/immunizations-allergy-shots/immunizations' },
-  { name: 'Columbia University', aliases: ['columbia'], url: 'https://www.health.columbia.edu/immunization-compliance-office' },
-  { name: 'University of Washington', aliases: ['university of washington', 'uw', 'washington university'], url: 'https://wellbeing.uw.edu/husky-health/immunity/general-requirements/' },
-  { name: 'University of Michigan', aliases: ['university of michigan', 'umich', 'michigan'], url: 'https://uhs.umich.edu/immunizations' },
-  { name: 'Purdue University', aliases: ['purdue'], url: 'https://www.purdue.edu/push/services/students/immunization-requirements.php' },
-  { name: 'University of Oregon', aliases: ['university of oregon', 'uoregon', 'oregon'], url: 'https://health.uoregon.edu/immunization-requirements-students' },
-  { name: 'University of Tennessee Knoxville', aliases: ['university of tennessee', 'utk', 'tennessee knoxville'], url: 'https://studenthealth.utk.edu/university-immunization-requirements/' },
-  { name: 'RIT', aliases: ['rit', 'rochester institute of technology'], url: 'https://www.rit.edu/studenthealth/immunizations' },
-  { name: 'Temple University', aliases: ['temple'], url: 'https://studenthealth.temple.edu/services/immunizations/immunization-requirements-incoming-students' },
-  { name: 'Illinois State University', aliases: ['illinois state', 'isu'], url: 'https://healthservices.illinoisstate.edu/medical-services/immunization-requirements/' },
-  { name: 'Southern Illinois University', aliases: ['southern illinois', 'siu'], url: 'https://shc.siu.edu/immunizations/requiredvaccines/' },
-  { name: 'Clark University', aliases: ['clark university', 'clark'], url: 'https://www.clarku.edu/health-services/immunization-policy/' },
-  { name: 'Methodist University', aliases: ['methodist university', 'methodist'], url: 'https://www.methodist.edu/life-at-mu/health-wellness/health-services/student-immunizations/' },
-  { name: 'Valparaiso University', aliases: ['valparaiso', 'valpo'], url: 'https://www.valpo.edu/student-life/student-health-center/valpo-international-students/immunization-requirements/' },
-] as const;
 
 const COLLEGE_VACCINE_INFO = `I am an AI assistant, not a doctor.
 
@@ -124,9 +102,7 @@ const ROUTE_RESPONSES: { path: string; label: string; keywords: string[] }[] = [
 
 function getAssistantIntent(message: string): AssistantIntent | null {
   const normalized = message.toLowerCase();
-  const matchedSchool = universityVaccineLinks.find(school =>
-    school.aliases.some(alias => normalized.includes(alias))
-  );
+  const matchedSchool = findUniversityByQuery(message);
 
   if (matchedSchool) {
     return {
@@ -134,9 +110,14 @@ function getAssistantIntent(message: string): AssistantIntent | null {
 
 For **${matchedSchool.name}**, this is the official university page specifically about student immunization or vaccine requirements:
 
-[${matchedSchool.name} immunization requirements](${matchedSchool.url})
+[${matchedSchool.name} immunization requirements](${matchedSchool.immunizationUrl})
 
-Requirements can change by program, residency status, and term, so use that university page as the source of truth.`,
+Common requirement categories in this demo database:
+${matchedSchool.commonRequirementTags.map(tag => `- ${tag}`).join('\n')}
+
+${matchedSchool.notes}
+
+Requirements can change by program, residency status, and term, so use that official university page as the source of truth.`,
       suggestions: ['Ask about another university', 'What vaccines do college students need?', 'Take me to sign up'],
     };
   }

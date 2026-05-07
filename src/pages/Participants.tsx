@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Calendar, Database, Link as LinkIcon, Send, Upload, UsersRound } from 'lucide-react';
+import { universities } from '../data/universities';
 
 interface Participant {
   id: number;
   name: string;
   phone: string;
   vaccinationDate: string;
+  university: string;
   status: 'Sent' | 'Ready';
 }
 
@@ -15,6 +17,7 @@ const initialParticipants: Participant[] = [
     name: 'Yifan TANG',
     phone: '+13051111111',
     vaccinationDate: '2026-05-05',
+    university: 'UCLA',
     status: 'Sent',
   },
   {
@@ -22,6 +25,7 @@ const initialParticipants: Participant[] = [
     name: 'tang',
     phone: '+13050000000',
     vaccinationDate: '2026-05-05',
+    university: 'MIT',
     status: 'Sent',
   },
 ];
@@ -30,6 +34,7 @@ export default function Participants() {
   const [participants, setParticipants] = useState<Participant[]>(initialParticipants);
   const [name, setName] = useState('Jamie Zhou');
   const [phone, setPhone] = useState('+15551234567');
+  const [university, setUniversity] = useState('UCLA');
   const [vaccinationDate, setVaccinationDate] = useState('');
 
   const enrollParticipant = () => {
@@ -41,12 +46,14 @@ export default function Participants() {
         name: name.trim() || 'Participant',
         phone: phone.trim(),
         vaccinationDate,
+        university,
         status: 'Ready',
       },
       ...prev,
     ]);
     setName('');
     setPhone('');
+    setUniversity('UCLA');
     setVaccinationDate('');
   };
 
@@ -92,6 +99,23 @@ export default function Participants() {
                   className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-base font-semibold text-slate-900 shadow-inner outline-none transition focus:border-health-blue focus:ring-4 focus:ring-health-blue/10"
                   placeholder="+15551234567"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-base font-black text-health-navy" htmlFor="participant-university">University</label>
+                <select
+                  id="participant-university"
+                  value={university}
+                  onChange={(event) => setUniversity(event.target.value)}
+                  className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-base font-semibold text-slate-900 shadow-inner outline-none transition focus:border-health-blue focus:ring-4 focus:ring-health-blue/10"
+                >
+                  {universities.map(school => (
+                    <option key={school.name} value={school.name}>{school.name}</option>
+                  ))}
+                </select>
+                <p className="text-xs font-semibold leading-5 text-slate-500">
+                  Demo database: {universities.length} universities with saved vaccine requirement links.
+                </p>
               </div>
 
               <div className="space-y-2">
@@ -148,6 +172,7 @@ export default function Participants() {
                   <tr className="border-b border-slate-200 text-base font-black text-slate-500">
                     <th className="px-7 py-4">Name</th>
                     <th className="px-7 py-4">Phone</th>
+                    <th className="px-7 py-4">University</th>
                     <th className="px-7 py-4">Vaccination date</th>
                     <th className="px-7 py-4">Last status</th>
                     <th className="px-7 py-4 text-right">Action</th>
@@ -158,6 +183,7 @@ export default function Participants() {
                     <tr key={participant.id} className="border-b border-slate-200 last:border-b-0">
                       <td className="px-7 py-5 text-base font-black text-health-navy">{participant.name}</td>
                       <td className="px-7 py-5 text-base font-semibold text-health-navy">{participant.phone}</td>
+                      <td className="px-7 py-5 text-base font-semibold text-health-navy">{participant.university}</td>
                       <td className="px-7 py-5 text-base font-semibold text-health-navy">{participant.vaccinationDate}</td>
                       <td className="px-7 py-5">
                         <span className={`inline-flex rounded-lg border px-3 py-1 text-sm font-black ${
