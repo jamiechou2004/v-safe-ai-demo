@@ -9,6 +9,7 @@ interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
+  suggestions?: string[];
   action?: {
     label: string;
     path: string;
@@ -22,6 +23,7 @@ interface HealthAssistantProps {
 
 interface AssistantIntent {
   response: string;
+  suggestions?: string[];
   navigateTo?: string;
   navigateLabel?: string;
 }
@@ -135,6 +137,7 @@ For **${matchedSchool.name}**, this is the official university page specifically
 [${matchedSchool.name} immunization requirements](${matchedSchool.url})
 
 Requirements can change by program, residency status, and term, so use that university page as the source of truth.`,
+      suggestions: ['Show all 20 university links', 'What vaccines do college students need?', 'Take me to sign up'],
     };
   }
 
@@ -147,7 +150,10 @@ Requirements can change by program, residency status, and term, so use that univ
     normalized.includes('学生') ||
     normalized.includes('学校疫苗')
   ) {
-    return { response: COLLEGE_VACCINE_INFO };
+    return {
+      response: COLLEGE_VACCINE_INFO,
+      suggestions: ['Ask about UCLA requirements', 'Ask about MIT requirements', 'Take me to sign up'],
+    };
   }
 
   if (
@@ -159,13 +165,17 @@ Requirements can change by program, residency status, and term, so use that univ
     normalized.includes('v-safe 是什么') ||
     normalized.includes('介绍')
   ) {
-    return { response: VSAFE_INFO };
+    return {
+      response: VSAFE_INFO,
+      suggestions: ['How does V-safe work?', 'Show privacy information', 'Take me to sign up'],
+    };
   }
 
   const route = ROUTE_RESPONSES.find(item => item.keywords.some(keyword => normalized.includes(keyword)));
   if (route) {
     return {
       response: `I found the right page for this: **${route.label}**.\n\nI will only open it if you confirm.`,
+      suggestions: ['Stay here', 'What is V-safe?', 'Show privacy information'],
       navigateTo: route.path,
       navigateLabel: route.label,
     };
@@ -204,6 +214,7 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: intent.response,
+        suggestions: intent.suggestions,
         action: intent.navigateTo
           ? {
               label: intent.navigateLabel ? `Open ${intent.navigateLabel}` : 'Open page',
@@ -222,6 +233,11 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
     const assistantMsg: Message = { id: (Date.now() + 1).toString(), role: 'assistant', content: response };
     setMessages(prev => [...prev, assistantMsg]);
     setIsLoading(false);
+  };
+
+  const getDefaultSuggestions = (msg: Message) => {
+    if (msg.role !== 'assistant' || msg.action) return [];
+    return msg.suggestions || ['Take me to sign up', 'What vaccines do college students need?', 'Show participants page'];
   };
 
   const handleConfirmNavigation = (message: Message) => {
@@ -395,6 +411,24 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                                 >
                                   Stay here
                                 </button>
+                              </div>
+                            </div>
+                          )}
+                          {msg.role === 'assistant' && !msg.action && getDefaultSuggestions(msg).length > 0 && (
+                            <div className="border-t border-slate-200 bg-slate-50 px-3 py-3">
+                              <div className="mb-2 text-[11px] font-black uppercase tracking-[0.16em] text-slate-400">
+                                You can ask next
+                              </div>
+                              <div className="flex flex-wrap gap-2">
+                                {getDefaultSuggestions(msg).map(suggestion => (
+                                  <button
+                                    key={suggestion}
+                                    onClick={() => handleSend(suggestion)}
+                                    className="rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-black text-slate-600 transition hover:border-health-blue/40 hover:bg-blue-50"
+                                  >
+                                    {suggestion}
+                                  </button>
+                                ))}
                               </div>
                             </div>
                           )}
