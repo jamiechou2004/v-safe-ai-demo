@@ -11,6 +11,7 @@ import Data from './pages/Data';
 import HowItWorks from './pages/HowItWorks';
 import Notes from './pages/Notes';
 import News from './pages/News';
+import Participants from './pages/Participants';
 
 export default function App() {
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -29,6 +30,7 @@ export default function App() {
             <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/notes" element={<Notes />} />
             <Route path="/news" element={<News />} />
+            <Route path="/participants" element={<Participants />} />
           </Routes>
         </main>
         <Footer />

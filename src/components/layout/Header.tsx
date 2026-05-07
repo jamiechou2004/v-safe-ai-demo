@@ -18,6 +18,7 @@ export default function Header({ isChatOpen, onToggleChat }: HeaderProps) {
     { name: 'Data and Research', path: '/data' },
     { name: 'How It Works', path: '/how-it-works' },
     { name: 'Notes for Participants', path: '/notes' },
+    { name: 'Participants', path: '/participants' },
     { name: 'What\'s New', path: '/news' },
     { name: 'Data Security and Privacy', path: '/privacy' },
   ];
@@ -84,12 +85,12 @@ export default function Header({ isChatOpen, onToggleChat }: HeaderProps) {
       {/* Main Navigation - Blue */}
       <nav className="hidden md:block bg-health-blue">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-1">
+          <div className="flex items-center">
             {mainNavItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`px-4 py-3 text-[13px] font-bold tracking-wide transition-all ${
+                className={`px-3 py-3 text-[12px] font-bold tracking-wide transition-all lg:px-4 lg:text-[13px] ${
                   location.pathname === item.path 
                     ? 'text-white border-b-4 border-white bg-white/10' 
                     : 'text-blue-50 border-b-4 border-transparent hover:text-white hover:bg-white/10'

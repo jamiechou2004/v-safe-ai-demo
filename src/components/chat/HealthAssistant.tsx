@@ -104,6 +104,11 @@ const ROUTE_RESPONSES: { path: string; label: string; keywords: string[] }[] = [
     keywords: ['notes', 'participant', 'tips', 'reminder', 'participant notes', '注意事项', '参与者', '提示'],
   },
   {
+    path: '/participants',
+    label: 'Participants roster',
+    keywords: ['participants', 'participant roster', 'enroll participant', 'roster', 'csv', 'database sync', '参与者名单', '参与者管理'],
+  },
+  {
     path: '/news',
     label: "What's new",
     keywords: ['news', "what's new", 'updates', 'latest', 'new features', '新闻', '更新', '最新'],
