@@ -1,0 +1,6 @@
+{
+  "name": "v-safe ai demo",
+  "description": "An AI-assisted V-safe demo for vaccine check-ins, general V-safe information, and student vaccine guidance.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

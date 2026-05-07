@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", sans-serif;
+  
+  --color-health-purple: #7146C3;
+  --color-health-blue: #3493D6;
+  --color-health-green: #55A751;
+  --color-health-navy: #1e293b;
+  
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+}
+
+@layer base {
+  body {
+    @apply bg-white text-slate-900 font-sans antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-sans font-bold tracking-tight;
+  }
+}
+
+.glass-card {
+  @apply bg-white border border-slate-200 shadow-sm rounded-xl overflow-hidden;
+}
+
+.btn-primary {
+  @apply bg-health-blue text-white px-6 py-2.5 rounded-lg font-bold text-sm transition-all hover:bg-blue-600 active:scale-[0.98] disabled:opacity-50 shadow-sm;
+}
+
+.btn-secondary {
+  @apply bg-transparent border-2 border-health-purple text-health-purple px-6 py-2.5 rounded-lg font-bold text-sm transition-all hover:bg-health-purple hover:text-white active:scale-[0.98];
+}
+
+.btn-success {
+  @apply bg-health-green text-white px-6 py-2.5 rounded-lg font-bold text-sm transition-all hover:bg-green-600 active:scale-[0.98];
+}
+
+.input-field {
+  @apply w-full p-3 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-health-blue/20 outline-none transition-all;
+}
+
