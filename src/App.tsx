@@ -7,6 +7,10 @@ import Home from './pages/Home';
 import CheckIn from './pages/CheckIn';
 import Emergency from './pages/Emergency';
 import Privacy from './pages/Privacy';
+import Data from './pages/Data';
+import HowItWorks from './pages/HowItWorks';
+import Notes from './pages/Notes';
+import News from './pages/News';
 
 export default function App() {
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -21,6 +25,10 @@ export default function App() {
             <Route path="/check-in" element={<CheckIn />} />
             <Route path="/emergency" element={<Emergency />} />
             <Route path="/privacy" element={<Privacy />} />
+            <Route path="/data" element={<Data />} />
+            <Route path="/how-it-works" element={<HowItWorks />} />
+            <Route path="/notes" element={<Notes />} />
+            <Route path="/news" element={<News />} />
           </Routes>
         </main>
         <Footer />

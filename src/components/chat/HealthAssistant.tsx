@@ -60,6 +60,30 @@ const ROUTE_RESPONSES: { path: string; label: string; keywords: string[]; respon
     response: `I am taking you to the privacy and data safety page now. It explains how this prototype describes collection, use, and protection of health information.`,
   },
   {
+    path: '/data',
+    label: 'Data and research',
+    keywords: ['data', 'research', 'statistics', 'study', 'studies', '数据', '研究', '统计'],
+    response: `I am taking you to the data and research page now. It explains what V-safe tracks and how reported information supports vaccine safety monitoring.`,
+  },
+  {
+    path: '/how-it-works',
+    label: 'How it works',
+    keywords: ['how it works', 'how does it work', 'steps', 'process', '流程', '怎么用', '如何使用'],
+    response: `I am taking you to the How It Works page now. It explains the register, report, and response flow for V-safe check-ins.`,
+  },
+  {
+    path: '/notes',
+    label: 'Participant notes',
+    keywords: ['notes', 'participant', 'tips', 'reminder', 'participant notes', '注意事项', '参与者', '提示'],
+    response: `I am taking you to the notes for participants page now. It includes practical tips for completing V-safe check-ins.`,
+  },
+  {
+    path: '/news',
+    label: "What's new",
+    keywords: ['news', "what's new", 'updates', 'latest', 'new features', '新闻', '更新', '最新'],
+    response: `I am taking you to the What's New page now. It highlights recent demo updates and participant support improvements.`,
+  },
+  {
     path: '/',
     label: 'About V-safe',
     keywords: ['home', 'about', 'about us', 'v-safe info', 'what is v-safe', '首页', '关于'],
