@@ -56,18 +56,20 @@ export default function Header({ isChatOpen, onToggleChat, onOpenAuth }: HeaderP
               </button>
               <button
                 onClick={onToggleChat}
-                className={`group relative overflow-hidden rounded-full border-2 px-3 py-2.5 text-xs font-black shadow-sm transition-all active:scale-[0.98] lg:px-5 lg:py-3 lg:text-sm ${
+                className={`group relative overflow-hidden rounded-full border px-3 py-2.5 text-xs font-black shadow-sm transition-all duration-200 hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-health-blue/15 active:translate-y-0 active:scale-[0.98] lg:px-5 lg:py-3 lg:text-sm ${
                   isChatOpen
-                    ? 'border-health-navy bg-health-navy text-white'
-                    : 'border-health-blue bg-white text-health-navy hover:border-health-purple hover:shadow-md'
+                    ? 'border-health-navy bg-health-navy text-white shadow-slate-300'
+                    : 'border-health-blue/70 bg-white text-health-navy hover:border-health-blue hover:bg-blue-50 hover:shadow-lg hover:shadow-blue-100/70'
                 }`}
                 aria-pressed={isChatOpen}
               >
-                <span className="absolute left-0 top-0 h-full w-1 bg-health-green" />
+                <span className={`absolute left-2 top-1/2 h-5 w-1 -translate-y-1/2 rounded-full transition-all duration-200 ${
+                  isChatOpen ? 'bg-health-green' : 'bg-health-green/80 group-hover:h-7'
+                }`} />
                 <span className="relative flex items-center gap-2">
-                  {isChatOpen ? <X className="h-4 w-4" /> : <MessageSquare className="h-4 w-4 text-health-blue transition group-hover:text-health-purple" />}
+                  {isChatOpen ? <X className="h-4 w-4" /> : <MessageSquare className="h-4 w-4 text-health-blue transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:text-health-blue" />}
                   {isChatOpen ? 'Close AI' : 'Ask V-safe AI'}
-                  {!isChatOpen && <Sparkles className="h-3.5 w-3.5 text-health-purple opacity-80" />}
+                  {!isChatOpen && <Sparkles className="h-3.5 w-3.5 text-health-purple opacity-80 transition-transform duration-200 group-hover:rotate-12 group-hover:scale-110" />}
                 </span>
               </button>
             </div>

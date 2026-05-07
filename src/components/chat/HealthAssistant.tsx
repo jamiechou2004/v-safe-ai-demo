@@ -279,8 +279,8 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
               <div className="border-b border-slate-200 bg-white px-5 py-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="relative flex h-12 w-12 items-center justify-center rounded-full border-2 border-health-blue bg-white text-health-blue shadow-sm">
-                      <span className="absolute left-0 h-8 w-1 rounded-full bg-health-green" />
+                    <div className="relative flex h-12 w-12 items-center justify-center rounded-full border border-health-blue/70 bg-blue-50 text-health-blue shadow-sm shadow-blue-100">
+                      <span className="absolute left-1 h-7 w-1 rounded-full bg-health-green" />
                       <MessageSquare className="h-5 w-5" />
                       <Sparkles className="absolute -right-1 -top-1 h-4 w-4 text-health-purple" />
                     </div>
