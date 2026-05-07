@@ -9,6 +9,10 @@ interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
+  action?: {
+    label: string;
+    path: string;
+  };
 }
 
 interface HealthAssistantProps {
@@ -19,6 +23,7 @@ interface HealthAssistantProps {
 interface AssistantIntent {
   response: string;
   navigateTo?: string;
+  navigateLabel?: string;
 }
 
 const VSAFE_INFO = `I am an AI assistant, not a doctor.
@@ -67,54 +72,46 @@ Here are 20 official university immunization requirement pages:
 
 ${universityVaccineLinks.map(([name, url], index) => `${index + 1}. [${name}](${url})`).join('\n')}`;
 
-const ROUTE_RESPONSES: { path: string; label: string; keywords: string[]; response: string }[] = [
+const ROUTE_RESPONSES: { path: string; label: string; keywords: string[] }[] = [
   {
     path: '/check-in',
     label: 'Sign up / Register',
     keywords: ['sign up', 'signup', 'register', 'registration', 'vaccine register', 'check in', 'check-in', 'report symptom', 'report how', '注册', '登记', '报名', '打卡', '报告症状'],
-    response: `I am taking you to the V-safe sign up page now. You can register your vaccine information and complete your check-in there.`,
   },
   {
     path: '/emergency',
     label: 'Emergency guidance',
     keywords: ['emergency', 'urgent', '911', 'chest pain', 'difficulty breathing', 'severe', '紧急', '急救', '胸痛', '呼吸困难', '严重'],
-    response: `I am taking you to emergency guidance now. If you have difficulty breathing, chest pain, face or throat swelling, or another severe symptom, call 911 or seek emergency care immediately.`,
   },
   {
     path: '/privacy',
     label: 'Privacy',
     keywords: ['privacy', 'security', 'data', 'personal information', '隐私', '安全', '数据'],
-    response: `I am taking you to the privacy and data safety page now. It explains how this prototype describes collection, use, and protection of health information.`,
   },
   {
     path: '/data',
     label: 'Data and research',
     keywords: ['data', 'research', 'statistics', 'study', 'studies', '数据', '研究', '统计'],
-    response: `I am taking you to the data and research page now. It explains what V-safe tracks and how reported information supports vaccine safety monitoring.`,
   },
   {
     path: '/how-it-works',
     label: 'How it works',
     keywords: ['how it works', 'how does it work', 'steps', 'process', '流程', '怎么用', '如何使用'],
-    response: `I am taking you to the How It Works page now. It explains the register, report, and response flow for V-safe check-ins.`,
   },
   {
     path: '/notes',
     label: 'Participant notes',
     keywords: ['notes', 'participant', 'tips', 'reminder', 'participant notes', '注意事项', '参与者', '提示'],
-    response: `I am taking you to the notes for participants page now. It includes practical tips for completing V-safe check-ins.`,
   },
   {
     path: '/news',
     label: "What's new",
     keywords: ['news', "what's new", 'updates', 'latest', 'new features', '新闻', '更新', '最新'],
-    response: `I am taking you to the What's New page now. It highlights recent demo updates and participant support improvements.`,
   },
   {
     path: '/',
     label: 'About V-safe',
     keywords: ['home', 'about', 'about us', 'v-safe info', 'what is v-safe', '首页', '关于'],
-    response: `I am taking you to the V-safe overview page now. It explains what V-safe is and how vaccine safety check-ins work.`,
   },
 ];
 
@@ -148,8 +145,9 @@ function getAssistantIntent(message: string): AssistantIntent | null {
   const route = ROUTE_RESPONSES.find(item => item.keywords.some(keyword => normalized.includes(keyword)));
   if (route) {
     return {
-      response: route.response,
+      response: `I can guide you to **${route.label}**. Would you like me to open that page now?`,
       navigateTo: route.path,
+      navigateLabel: route.label,
     };
   }
 
@@ -182,11 +180,17 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
 
     const intent = getAssistantIntent(messageContent);
     if (intent) {
-      if (intent.navigateTo) {
-        navigate(intent.navigateTo);
-      }
-
-      const assistantMsg: Message = { id: (Date.now() + 1).toString(), role: 'assistant', content: intent.response };
+      const assistantMsg: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: intent.response,
+        action: intent.navigateTo
+          ? {
+              label: intent.navigateLabel ? `Open ${intent.navigateLabel}` : 'Open page',
+              path: intent.navigateTo,
+            }
+          : undefined,
+      };
       setMessages(prev => [...prev, assistantMsg]);
       setIsLoading(false);
       return;
@@ -198,6 +202,20 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
     const assistantMsg: Message = { id: (Date.now() + 1).toString(), role: 'assistant', content: response };
     setMessages(prev => [...prev, assistantMsg]);
     setIsLoading(false);
+  };
+
+  const handleConfirmNavigation = (message: Message) => {
+    if (!message.action) return;
+
+    navigate(message.action.path);
+    setMessages(prev => [
+      ...prev,
+      {
+        id: `${Date.now()}-nav`,
+        role: 'assistant',
+        content: `Done - I opened **${message.action.label.replace('Open ', '')}**. I will stay here if you need anything else.`,
+      },
+    ]);
   };
 
   return (
@@ -330,6 +348,32 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                             </ReactMarkdown>
                           </div>
                         </div>
+                        {msg.role === 'assistant' && msg.action && (
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            <button
+                              onClick={() => handleConfirmNavigation(msg)}
+                              className="inline-flex items-center gap-2 rounded border border-health-blue bg-health-blue px-3 py-2 text-xs font-black text-white transition hover:bg-blue-600"
+                            >
+                              {msg.action.label}
+                              <ChevronRight className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              onClick={() =>
+                                setMessages(prev => [
+                                  ...prev,
+                                  {
+                                    id: `${Date.now()}-stay`,
+                                    role: 'assistant',
+                                    content: 'No problem. I will stay on this page and keep helping here.',
+                                  },
+                                ])
+                              }
+                              className="inline-flex items-center rounded border border-slate-300 bg-white px-3 py-2 text-xs font-black text-slate-600 transition hover:bg-slate-50"
+                            >
+                              Stay here
+                            </button>
+                          </div>
+                        )}
                       </div>
                     ))}
                     {isLoading && (
