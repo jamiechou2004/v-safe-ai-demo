@@ -225,12 +225,15 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
               <div className="border-b border-slate-200 bg-white px-5 py-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-health-blue text-white shadow-sm">
+                    <div className="relative flex h-12 w-12 items-center justify-center rounded-full border-2 border-health-blue bg-white text-health-blue shadow-sm">
+                      <span className="absolute left-0 h-8 w-1 rounded-full bg-health-green" />
                       <MessageSquare className="h-5 w-5" />
+                      <Sparkles className="absolute -right-1 -top-1 h-4 w-4 text-health-purple" />
                     </div>
                     <div>
                       <p className="text-[11px] font-black uppercase tracking-[0.22em] text-slate-400">V-safe AI demo</p>
                       <h2 className="text-xl font-black tracking-tight text-health-navy">Ask V-safe AI</h2>
+                      <p className="mt-0.5 text-xs font-semibold text-slate-500">Navigation, check-in support, and campus vaccine links</p>
                     </div>
                   </div>
                   <button 

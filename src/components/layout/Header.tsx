@@ -46,6 +46,12 @@ export default function Header({ isChatOpen, onToggleChat }: HeaderProps) {
               <button className="rounded border-2 border-slate-200 px-5 py-3 text-sm font-black text-health-navy transition-all hover:border-health-blue/30 hover:bg-slate-50">
                 Log In
               </button>
+              <Link
+                to="/check-in"
+                className="rounded bg-health-blue px-7 py-3 text-sm font-black text-white shadow-md shadow-blue-100 transition-all hover:bg-blue-600"
+              >
+                Register Now
+              </Link>
               <button
                 onClick={onToggleChat}
                 className={`group relative overflow-hidden rounded-full border-2 px-5 py-3 text-sm font-black shadow-sm transition-all active:scale-[0.98] ${
@@ -62,12 +68,6 @@ export default function Header({ isChatOpen, onToggleChat }: HeaderProps) {
                   {!isChatOpen && <Sparkles className="h-3.5 w-3.5 text-health-purple opacity-80" />}
                 </span>
               </button>
-              <Link
-                to="/check-in"
-                className="rounded bg-health-blue px-7 py-3 text-sm font-black text-white shadow-md shadow-blue-100 transition-all hover:bg-blue-600"
-              >
-                Register Now
-              </Link>
             </div>
 
             {/* Mobile Menu Button */}
