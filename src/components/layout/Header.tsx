@@ -1,14 +1,15 @@
-import { ShieldCheck, Menu, X, Globe, ChevronDown, MessageSquare } from 'lucide-react';
+import { Menu, X, Globe, ChevronDown, MessageSquare, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import StudentDisclaimer from '../common/StudentDisclaimer';
 import VSafeLogo from '../common/VSafeLogo';
 
 interface HeaderProps {
-  onOpenChat: () => void;
+  isChatOpen: boolean;
+  onToggleChat: () => void;
 }
 
-export default function Header({ onOpenChat }: HeaderProps) {
+export default function Header({ isChatOpen, onToggleChat }: HeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
@@ -28,36 +29,42 @@ export default function Header({ onOpenChat }: HeaderProps) {
       {/* Top Header - White */}
       <div className="bg-white py-4 md:py-6 border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center">
+          <div className="flex items-center justify-between gap-6">
             {/* Logo Area */}
             <Link id="logo-link" to="/" className="flex items-center">
               <VSafeLogo />
             </Link>
 
             {/* Top Right Utilities */}
-            <div className="hidden md:flex items-center gap-6">
+            <div className="hidden items-center gap-4 md:flex">
               <button className="flex items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-health-navy transition-colors">
                 <Globe className="w-4 h-4" />
                 English
                 <ChevronDown className="w-4 h-4" />
               </button>
               <div className="h-6 w-px bg-slate-200" />
-              <button className="text-sm font-bold text-health-navy border-2 border-slate-200 px-5 py-2 rounded-lg hover:bg-slate-50 transition-all">
+              <button className="rounded border-2 border-slate-200 px-5 py-3 text-sm font-black text-health-navy transition-all hover:border-health-blue/30 hover:bg-slate-50">
                 Log In
               </button>
               <button
-                onClick={onOpenChat}
-                className="group relative p-[2px] rounded-full transition-all hover:scale-105 active:scale-95"
+                onClick={onToggleChat}
+                className={`group relative overflow-hidden rounded-full border-2 px-5 py-3 text-sm font-black shadow-sm transition-all active:scale-[0.98] ${
+                  isChatOpen
+                    ? 'border-health-navy bg-health-navy text-white'
+                    : 'border-health-blue bg-white text-health-navy hover:border-health-purple hover:shadow-md'
+                }`}
+                aria-pressed={isChatOpen}
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-health-blue to-health-purple rounded-full" />
-                <div className="relative flex items-center gap-2 bg-white px-5 py-2.5 rounded-full text-health-navy font-bold text-sm">
-                  <MessageSquare className="w-4 h-4 text-health-blue" />
-                  Ask V-safe AI
-                </div>
+                <span className="absolute left-0 top-0 h-full w-1 bg-health-green" />
+                <span className="relative flex items-center gap-2">
+                  {isChatOpen ? <X className="h-4 w-4" /> : <MessageSquare className="h-4 w-4 text-health-blue transition group-hover:text-health-purple" />}
+                  {isChatOpen ? 'Close AI' : 'Ask V-safe AI'}
+                  {!isChatOpen && <Sparkles className="h-3.5 w-3.5 text-health-purple opacity-80" />}
+                </span>
               </button>
               <Link
                 to="/check-in"
-                className="bg-health-blue text-white px-6 py-3 rounded-lg font-bold text-sm hover:bg-blue-600 transition-all shadow-md shadow-blue-100"
+                className="rounded bg-health-blue px-7 py-3 text-sm font-black text-white shadow-md shadow-blue-100 transition-all hover:bg-blue-600"
               >
                 Register Now
               </Link>
@@ -107,12 +114,14 @@ export default function Header({ onOpenChat }: HeaderProps) {
             <button
               onClick={() => {
                 setIsOpen(false);
-                onOpenChat();
+                onToggleChat();
               }}
-              className="flex items-center justify-center gap-3 w-full bg-gradient-to-r from-health-purple to-health-blue text-white py-4 rounded-xl font-bold mb-6 shadow-lg"
+              className={`mb-6 flex w-full items-center justify-center gap-3 rounded-lg py-4 font-black shadow-lg ${
+                isChatOpen ? 'bg-health-navy text-white' : 'bg-health-blue text-white'
+              }`}
             >
-              <MessageSquare className="w-5 h-5" />
-              Ask V-safe AI
+              {isChatOpen ? <X className="w-5 h-5" /> : <MessageSquare className="w-5 h-5" />}
+              {isChatOpen ? 'Close V-safe AI' : 'Ask V-safe AI'}
             </button>
             
             <div className="space-y-1">

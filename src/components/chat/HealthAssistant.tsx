@@ -31,6 +31,29 @@ You can use this prototype to:
 - Find emergency guidance
 - Review privacy and data safety information`;
 
+const universityVaccineLinks = [
+  ['Harvard University', 'https://huhs.harvard.edu/patients-and-visitors/medical-records-and-immunizations/immunization-compliance/'],
+  ['MIT', 'https://health.mit.edu/faqs/medical-report-immunizations'],
+  ['UCLA', 'https://immunizationrequirement.ucla.edu/'],
+  ['USC', 'https://sites.usc.edu/new-student-health-requirements/immunizations/'],
+  ['UC Irvine', 'https://studenthealth.uci.edu/immunization-requirements/'],
+  ['UC Santa Barbara', 'https://studenthealth.sa.ucsb.edu/immunizations/university-immunization-requirements'],
+  ['Cornell University', 'https://health.cornell.edu/services/immunizations-allergy-shots/immunizations'],
+  ['Columbia University', 'https://www.health.columbia.edu/immunization-compliance-office'],
+  ['University of Washington', 'https://wellbeing.uw.edu/husky-health/immunity/general-requirements/'],
+  ['University of Michigan', 'https://uhs.umich.edu/immunizations'],
+  ['Purdue University', 'https://www.purdue.edu/push/services/students/immunization-requirements.php'],
+  ['University of Oregon', 'https://health.uoregon.edu/immunization-requirements-students'],
+  ['University of Tennessee Knoxville', 'https://studenthealth.utk.edu/university-immunization-requirements/'],
+  ['RIT', 'https://www.rit.edu/studenthealth/immunizations'],
+  ['Temple University', 'https://studenthealth.temple.edu/services/immunizations/immunization-requirements-incoming-students'],
+  ['Illinois State University', 'https://healthservices.illinoisstate.edu/medical-services/immunization-requirements/'],
+  ['Southern Illinois University', 'https://shc.siu.edu/immunizations/requiredvaccines/'],
+  ['Clark University', 'https://www.clarku.edu/health-services/immunization-policy/'],
+  ['Methodist University', 'https://www.methodist.edu/life-at-mu/health-wellness/health-services/student-immunizations/'],
+  ['Valparaiso University', 'https://www.valpo.edu/student-life/student-health-center/valpo-international-students/immunization-requirements/'],
+] as const;
+
 const COLLEGE_VACCINE_INFO = `I am an AI assistant, not a doctor.
 
 College vaccine requirements depend on your school and state, so the most accurate source is your university's student health or immunization requirements page. For general U.S. guidance, start here:
@@ -38,7 +61,11 @@ College vaccine requirements depend on your school and state, so the most accura
 - [CDC vaccines by age](https://www.cdc.gov/vaccines/by-age/index.html)
 - [CDC adult immunization schedule](https://www.cdc.gov/vaccines/imz-schedules/adult-easyread.html)
 
-Common college requirements often include MMR, Tdap, meningococcal vaccines, hepatitis B, and varicella, but your university's own requirement page is the one to follow.`;
+Common college requirements often include MMR, Tdap, meningococcal vaccines, hepatitis B, and varicella, but your university's own requirement page is the one to follow.
+
+Here are 20 official university immunization requirement pages:
+
+${universityVaccineLinks.map(([name, url], index) => `${index + 1}. [${name}](${url})`).join('\n')}`;
 
 const ROUTE_RESPONSES: { path: string; label: string; keywords: string[]; response: string }[] = [
   {
@@ -175,20 +202,6 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
 
   return (
     <>
-      {/* Floating Button - Secondary Entry */}
-      <div className={`fixed bottom-6 right-6 z-40 transition-all duration-500 ${isOpen ? 'opacity-0 pointer-events-none scale-90' : 'opacity-100'}`}>
-        <button
-          onClick={() => setIsOpen(true)}
-          className="p-4 bg-health-blue text-white rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all flex items-center justify-center group"
-          aria-label="Ask v-safe ai demo assistant"
-        >
-          <MessageSquare className="w-6 h-6" />
-          <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 font-bold whitespace-nowrap ml-0 group-hover:ml-2">
-            Ask V-safe AI
-          </span>
-        </button>
-      </div>
-
       <AnimatePresence>
         {isOpen && (
           <>
@@ -230,7 +243,7 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                 </div>
                 <div className="mt-4 flex items-center gap-2 rounded-lg border border-health-blue/15 bg-health-blue/5 px-3 py-2 text-xs font-semibold text-health-navy">
                   <ShieldCheck className="h-4 w-4 text-health-green" />
-                  Demo assistant for navigation and general V-safe information
+                  Routes pages, explains V-safe, and surfaces university vaccine links
                 </div>
               </div>
 
@@ -268,6 +281,13 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                         className="group flex w-full items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-bold text-health-navy shadow-sm transition hover:border-health-blue/40 hover:bg-blue-50/40"
                       >
                         <span>College vaccine requirements</span>
+                        <ExternalLink className="w-4 h-4 text-health-purple group-hover:translate-x-1 transition-transform" />
+                      </button>
+                      <button 
+                        onClick={() => handleSend("Show me official university vaccine requirement links")}
+                        className="group flex w-full items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-bold text-health-navy shadow-sm transition hover:border-health-blue/40 hover:bg-blue-50/40"
+                      >
+                        <span>20 university vaccine links</span>
                         <ExternalLink className="w-4 h-4 text-health-purple group-hover:translate-x-1 transition-transform" />
                       </button>
                       <button 

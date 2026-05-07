@@ -18,7 +18,7 @@ export default function App() {
   return (
     <Router>
       <div className="flex flex-col min-h-screen">
-        <Header onOpenChat={() => setIsChatOpen(true)} />
+        <Header isChatOpen={isChatOpen} onToggleChat={() => setIsChatOpen(open => !open)} />
         <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
