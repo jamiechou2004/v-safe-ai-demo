@@ -47,9 +47,10 @@ export default function CheckIn() {
 
   const renderVaccineStep = () => (
     <div className="space-y-6">
-      <div className="space-y-2 text-center mb-8">
-        <h2 className="text-3xl font-display font-bold text-health-navy">Tell us about your vaccination</h2>
-        <p className="text-slate-500">Please provide the details found on your vaccine card.</p>
+      <div className="mb-8 space-y-2 border-b border-slate-200 pb-6">
+        <p className="text-sm font-black uppercase tracking-[0.18em] text-health-blue">Step 1</p>
+        <h2 className="text-3xl font-black text-health-navy">Tell us about your vaccination</h2>
+        <p className="text-slate-600">Please provide the details found on your vaccine card.</p>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -58,7 +59,7 @@ export default function CheckIn() {
           <select 
             value={formData.vaccineType}
             onChange={(e) => setFormData({...formData, vaccineType: e.target.value})}
-            className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-health-green/20 outline-none transition-all"
+            className="w-full rounded border border-slate-300 bg-white p-4 outline-none transition-all focus:border-health-blue focus:ring-4 focus:ring-health-blue/10"
           >
             <option value="">Select a vaccine...</option>
             <option value="covid_pfizer">COVID-19 (Pfizer-BioNTech)</option>
@@ -105,9 +106,10 @@ export default function CheckIn() {
 
   const renderLocationStep = () => (
     <div className="space-y-6">
-      <div className="space-y-2 text-center mb-8">
-        <h2 className="text-3xl font-bold text-slate-900">Where was the shot given?</h2>
-        <p className="text-slate-500">Search for the healthcare facility or pharmacy.</p>
+      <div className="mb-8 space-y-2 border-b border-slate-200 pb-6">
+        <p className="text-sm font-black uppercase tracking-[0.18em] text-health-blue">Step 2</p>
+        <h2 className="text-3xl font-black text-slate-900">Where was the shot given?</h2>
+        <p className="text-slate-600">Search for the healthcare facility or pharmacy.</p>
       </div>
       
       <div className="space-y-4">
@@ -134,9 +136,10 @@ export default function CheckIn() {
 
   const renderSymptomsStep = () => (
     <div className="space-y-6">
-      <div className="space-y-2 text-center mb-8">
-        <h2 className="text-3xl font-display font-bold text-health-navy">How are you feeling?</h2>
-        <p className="text-slate-500">Select any symptoms you've experienced since your shot.</p>
+      <div className="mb-8 space-y-2 border-b border-slate-200 pb-6">
+        <p className="text-sm font-black uppercase tracking-[0.18em] text-health-blue">Step 3</p>
+        <h2 className="text-3xl font-black text-health-navy">How are you feeling?</h2>
+        <p className="text-slate-600">Select any symptoms you've experienced since your shot.</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -148,7 +151,7 @@ export default function CheckIn() {
           <button
             key={s}
             onClick={() => toggleSymptom(s)}
-            className={`flex items-center gap-3 p-4 rounded-xl text-left transition-all border ${
+            className={`flex items-center gap-3 rounded border p-4 text-left transition-all ${
               formData.symptoms.includes(s)
                 ? 'bg-health-purple/5 border-health-purple text-health-purple font-bold'
                 : 'bg-white border-slate-200 text-slate-600 hover:border-health-purple/30'
@@ -168,9 +171,10 @@ export default function CheckIn() {
 
   const renderSeverityStep = () => (
     <div className="space-y-6">
-      <div className="space-y-2 text-center mb-8">
-        <h2 className="text-3xl font-display font-bold text-health-navy">Just a few more details</h2>
-        <p className="text-slate-500">Help us understand the intensity of your symptoms.</p>
+      <div className="mb-8 space-y-2 border-b border-slate-200 pb-6">
+        <p className="text-sm font-black uppercase tracking-[0.18em] text-health-blue">Step 4</p>
+        <h2 className="text-3xl font-black text-health-navy">Just a few more details</h2>
+        <p className="text-slate-600">Help us understand the intensity of your symptoms.</p>
       </div>
 
       <div className="space-y-6">
@@ -185,7 +189,7 @@ export default function CheckIn() {
               <button
                 key={v.key}
                 onClick={() => setFormData({...formData, severity: v.key})}
-                className={`p-4 rounded-xl flex flex-col items-center gap-1 border transition-all ${
+                className={`flex flex-col items-center gap-1 rounded border p-4 transition-all ${
                   formData.severity === v.key
                     ? 'bg-health-purple text-white border-health-purple shadow-md'
                     : 'bg-white text-slate-600 border-slate-200'
@@ -205,7 +209,7 @@ export default function CheckIn() {
             onChange={(e) => setFormData({...formData, notes: e.target.value})}
             placeholder="Tell us more about how you feel..."
             rows={4}
-            className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-health-green/20 outline-none resize-none"
+            className="w-full resize-none rounded border border-slate-300 bg-white p-4 outline-none focus:border-health-blue focus:ring-4 focus:ring-health-blue/10"
           />
         </div>
       </div>
@@ -255,11 +259,18 @@ export default function CheckIn() {
   );
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12 md:py-24">
+    <div className="bg-slate-100 px-4 py-10 md:py-14">
+      <div className="mx-auto max-w-5xl">
+        <div className="mb-8 bg-white px-6 py-8 shadow-sm md:px-10">
+          <h1 className="text-4xl font-black tracking-tight text-slate-950">V-safe check-in</h1>
+          <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-600">
+            Complete this short demo check-in to report vaccine information and symptoms. This prototype does not submit real health data.
+          </p>
+        </div>
       {step !== 'confirmation' && (
-        <div className="mb-12">
+        <div className="mb-8 bg-white px-6 py-6 shadow-sm md:px-10">
           {/* Progress Indicator */}
-          <div className="flex justify-between items-center relative mb-8">
+          <div className="relative flex items-center justify-between">
             <div className="absolute top-1/2 left-0 w-full h-0.5 bg-slate-200 -translate-y-1/2 z-0" />
             <div 
               className="absolute top-1/2 left-0 h-0.5 bg-health-green -translate-y-1/2 z-0 transition-all duration-500" 
@@ -290,7 +301,7 @@ export default function CheckIn() {
         </div>
       )}
 
-      <div className={`${step === 'confirmation' ? '' : 'glass-card p-6 md:p-12 rounded-[2.5rem] shadow-xl'}`}>
+      <div className={`${step === 'confirmation' ? 'bg-white px-6 py-12 shadow-sm md:px-10' : 'border border-slate-200 bg-white p-6 shadow-sm md:p-10'}`}>
         <AnimatePresence mode="wait">
           <motion.div
             key={step}
@@ -308,7 +319,7 @@ export default function CheckIn() {
         </AnimatePresence>
 
         {step !== 'confirmation' && (
-          <div className="flex justify-between mt-12 pt-8 border-t border-slate-100">
+          <div className="mt-12 flex justify-between border-t border-slate-200 pt-8">
             <button
               onClick={() => {
                 if (step === 'location') setStep('vaccine');
@@ -335,6 +346,7 @@ export default function CheckIn() {
             </button>
           </div>
         )}
+      </div>
       </div>
     </div>
   );

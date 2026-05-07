@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2, MessageSquare, ChevronRight, MoreVertical, ExternalLink, MapPinned } from 'lucide-react';
+import { X, Send, Loader2, MessageSquare, ChevronRight, ExternalLink, MapPinned, ShieldCheck, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
 import { useNavigate } from 'react-router-dom';
@@ -198,7 +198,7 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
-              className="fixed inset-0 bg-black/5 backdrop-blur-[2px] z-50 pointer-events-auto"
+              className="fixed inset-0 bg-slate-950/10 z-50 pointer-events-auto"
             />
             
             {/* Chat Panel */}
@@ -206,82 +206,94 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 bottom-0 w-full md:w-[480px] bg-white shadow-[0_0_50px_rgba(0,0,0,0.1)] z-50 flex flex-col pointer-events-auto"
+              transition={{ type: 'spring', damping: 30, stiffness: 260 }}
+              className="fixed top-0 right-0 bottom-0 w-full border-l border-slate-200 bg-white md:w-[430px] shadow-2xl shadow-slate-950/15 z-50 flex flex-col pointer-events-auto"
             >
-              {/* Header Utils */}
-              <div className="flex justify-end p-4 gap-4 text-slate-400">
-                <button className="hover:text-slate-600 transition-colors">
-                  <MoreVertical className="w-6 h-6" />
-                </button>
-                <div className="flex border border-slate-300 rounded px-1 gap-0.5 items-center">
-                  <div className="w-2 h-3 bg-slate-300 rounded-sm" />
-                  <div className="w-3 h-3 bg-slate-900 rounded-sm" />
+              <div className="border-b border-slate-200 bg-white px-5 py-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-health-blue text-white shadow-sm">
+                      <MessageSquare className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-black uppercase tracking-[0.22em] text-slate-400">V-safe AI demo</p>
+                      <h2 className="text-xl font-black tracking-tight text-health-navy">Ask V-safe AI</h2>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setIsOpen(false)}
+                    className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+                    aria-label="Close assistant"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
                 </div>
-                <button 
-                  onClick={() => setIsOpen(false)}
-                  className="hover:text-slate-600 transition-colors"
-                >
-                  <X className="w-7 h-7" />
-                </button>
+                <div className="mt-4 flex items-center gap-2 rounded-lg border border-health-blue/15 bg-health-blue/5 px-3 py-2 text-xs font-semibold text-health-navy">
+                  <ShieldCheck className="h-4 w-4 text-health-green" />
+                  Demo assistant for navigation and general V-safe information
+                </div>
               </div>
 
               {/* Content Area */}
-              <div className="flex-1 overflow-y-auto px-10 py-4">
+              <div className="flex-1 overflow-y-auto bg-slate-50/70 px-5 py-5">
                 {messages.length === 0 ? (
-                  <div className="space-y-8 pt-10">
-                    <div className="space-y-1">
-                      <p className="text-slate-400 font-bold text-[10px] tracking-[0.3em] uppercase opacity-70">V-SAFE AI DEMO</p>
-                      <h2 className="text-4xl font-bold text-health-blue tracking-tight">Hello, Jamie</h2>
-                      <p className="text-lg font-bold text-slate-400 leading-tight">What can I assist you with today?</p>
+                  <div className="space-y-5">
+                    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                      <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-health-green/10 text-health-green">
+                        <Sparkles className="h-5 w-5" />
+                      </div>
+                      <h3 className="text-2xl font-black tracking-tight text-health-navy">Hello, Jamie</h3>
+                      <p className="mt-2 text-sm leading-6 text-slate-600">
+                        I can help you navigate the demo, explain V-safe, or find vaccine requirement resources for students.
+                      </p>
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-2.5">
                       <button 
                         onClick={() => handleSend("Take me to the sign up page")}
-                        className="w-full flex justify-between items-center px-6 py-3.5 border border-slate-200 rounded-xl bg-white text-left font-bold text-health-navy hover:border-health-purple/30 hover:bg-slate-50 transition-all group shadow-sm"
+                        className="group flex w-full items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-bold text-health-navy shadow-sm transition hover:border-health-blue/40 hover:bg-blue-50/40"
                       >
-                        Take me to sign up
+                        <span>Take me to sign up</span>
                         <MapPinned className="w-4 h-4 text-health-purple group-hover:translate-x-1 transition-transform" />
                       </button>
                       <button 
                         onClick={() => handleSend("Report how I'm feeling today")}
-                        className="w-full flex justify-between items-center px-6 py-3.5 border border-slate-200 rounded-xl bg-white text-left font-bold text-health-navy hover:border-health-purple/30 hover:bg-slate-50 transition-all group shadow-sm"
+                        className="group flex w-full items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-bold text-health-navy shadow-sm transition hover:border-health-blue/40 hover:bg-blue-50/40"
                       >
-                        Report how I'm feeling today
+                        <span>Report how I'm feeling today</span>
                         <ChevronRight className="w-4 h-4 text-health-purple group-hover:translate-x-1 transition-transform" />
                       </button>
                       <button 
                         onClick={() => handleSend("What vaccines do college students need?")}
-                        className="w-full flex justify-between items-center px-6 py-3.5 border border-slate-200 rounded-xl bg-white text-left font-bold text-health-navy hover:border-health-purple/30 hover:bg-slate-50 transition-all group shadow-sm"
+                        className="group flex w-full items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-bold text-health-navy shadow-sm transition hover:border-health-blue/40 hover:bg-blue-50/40"
                       >
-                        College vaccine requirements
+                        <span>College vaccine requirements</span>
                         <ExternalLink className="w-4 h-4 text-health-purple group-hover:translate-x-1 transition-transform" />
                       </button>
                       <button 
                         onClick={() => handleSend("What is V-safe?")}
-                        className="w-full flex justify-between items-center px-6 py-3.5 border border-slate-200 rounded-xl bg-white text-left font-bold text-health-navy hover:border-health-purple/30 hover:bg-slate-50 transition-all group shadow-sm"
+                        className="group flex w-full items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-bold text-health-navy shadow-sm transition hover:border-health-blue/40 hover:bg-blue-50/40"
                       >
-                        What is V-safe?
+                        <span>What is V-safe?</span>
                         <ChevronRight className="w-4 h-4 text-health-purple group-hover:translate-x-1 transition-transform" />
                       </button>
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-6 pt-4 pb-20">
+                  <div className="space-y-4 pb-4">
                     {messages.map((msg) => (
                       <div
                         key={msg.id}
                         className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                       >
                         <div
-                          className={`max-w-[90%] p-5 rounded-[2rem] ${
+                          className={`max-w-[86%] px-4 py-3 text-sm leading-6 shadow-sm ${
                             msg.role === 'user'
-                              ? 'bg-health-blue text-white rounded-tr-none shadow-md'
-                              : 'bg-slate-50 text-slate-800 rounded-tl-none border border-slate-100'
+                              ? 'rounded-2xl rounded-tr-md bg-health-blue text-white'
+                              : 'rounded-2xl rounded-tl-md border border-slate-200 bg-white text-slate-800'
                           }`}
                         >
-                          <div className="markdown-body text-[16px] leading-relaxed">
+                          <div className="markdown-body leading-6">
                             <ReactMarkdown
                               components={{
                                 a: ({ children, href }) => (
@@ -299,9 +311,9 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                     ))}
                     {isLoading && (
                       <div className="flex justify-start">
-                        <div className="bg-slate-50 border border-slate-100 p-5 rounded-[2rem] rounded-tl-none flex items-center gap-3">
-                          <Loader2 className="w-5 h-5 text-health-blue animate-spin" />
-                          <span className="text-sm text-slate-500 font-bold tracking-tight">V-safe AI is thinking...</span>
+                        <div className="flex items-center gap-3 rounded-2xl rounded-tl-md border border-slate-200 bg-white px-4 py-3 shadow-sm">
+                          <Loader2 className="w-4 h-4 text-health-blue animate-spin" />
+                          <span className="text-sm text-slate-500 font-bold">V-safe AI is thinking...</span>
                         </div>
                       </div>
                     )}
@@ -311,9 +323,9 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
               </div>
 
               {/* Input Area */}
-              <div className="px-8 pb-8 pt-4">
-                <div className="relative flex items-center gap-3">
-                  <div className="flex-1 bg-slate-100 rounded-2xl overflow-hidden focus-within:ring-2 focus-within:ring-health-blue/20 transition-all">
+              <div className="border-t border-slate-200 bg-white px-5 py-4">
+                <div className="relative flex items-end gap-3">
+                  <div className="flex-1 overflow-hidden rounded-xl border border-slate-200 bg-slate-50 transition-all focus-within:border-health-blue focus-within:ring-4 focus-within:ring-health-blue/10">
                     <textarea
                       rows={2}
                       value={input}
@@ -325,23 +337,22 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                         }
                       }}
                       placeholder="Type your message..."
-                      className="w-full px-5 py-4 bg-transparent border-none text-base text-slate-700 placeholder:text-slate-400 outline-none resize-none block"
+                      className="block w-full resize-none border-none bg-transparent px-4 py-3 text-sm text-slate-700 outline-none placeholder:text-slate-400"
                     />
                   </div>
                   <button
                     onClick={() => handleSend()}
                     disabled={!input.trim() || isLoading}
-                    className="w-12 h-12 bg-gradient-to-tr from-health-blue to-health-purple text-white rounded-xl flex items-center justify-center hover:shadow-lg active:scale-95 disabled:opacity-30 transition-all shrink-0"
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-health-blue text-white transition-all hover:bg-blue-600 active:scale-95 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
+                    aria-label="Send message"
                   >
-                    <Send className="w-5 h-5 -rotate-12" />
+                    <Send className="w-5 h-5" />
                   </button>
                 </div>
                 
-                {messages.length > 0 && (
-                  <p className="text-center text-[11px] text-slate-400 mt-8 font-bold uppercase tracking-[0.2em] opacity-50">
-                    Secured by V-safe Privacy Guard
-                  </p>
-                )}
+                <p className="mt-3 text-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-300">
+                  Demo only - Not medical advice
+                </p>
               </div>
             </motion.div>
           </>

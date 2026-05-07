@@ -1,5 +1,6 @@
 import { Mail, Phone, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import VSafeLogo from '../common/VSafeLogo';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -9,12 +10,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
         <div className="col-span-1 md:col-span-2">
           <div className="flex items-center mb-6">
-            <img 
-              src="https://storage.googleapis.com/ais-cloud-run-public-assets/vsafe-logo.png" 
-              alt="V-safe Logo" 
-              className="h-12 object-contain brightness-0 invert"
-              referrerPolicy="no-referrer"
-            />
+            <VSafeLogo inverted compact />
           </div>
           <p className="text-slate-400 max-w-md mb-8 leading-relaxed">
             A research-based redesign focusing on the patient experience. V-safe is a safety monitoring system that allows you to share how you feel after your vaccination.

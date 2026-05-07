@@ -2,6 +2,7 @@ import { ShieldCheck, Menu, X, Globe, ChevronDown, MessageSquare } from 'lucide-
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import StudentDisclaimer from '../common/StudentDisclaimer';
+import VSafeLogo from '../common/VSafeLogo';
 
 interface HeaderProps {
   onOpenChat: () => void;
@@ -30,12 +31,7 @@ export default function Header({ onOpenChat }: HeaderProps) {
           <div className="flex justify-between items-center">
             {/* Logo Area */}
             <Link id="logo-link" to="/" className="flex items-center">
-              <img 
-                src="https://storage.googleapis.com/ais-cloud-run-public-assets/vsafe-logo.png" 
-                alt="V-safe Logo" 
-                className="h-14 md:h-16 object-contain"
-                referrerPolicy="no-referrer"
-              />
+              <VSafeLogo />
             </Link>
 
             {/* Top Right Utilities */}

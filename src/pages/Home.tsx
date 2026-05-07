@@ -1,160 +1,129 @@
-import { motion } from 'motion/react';
-import { ShieldCheck, HeartPulse, Activity, MessageSquare, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { CalendarCheck2, CheckCircle2, ClipboardList, LockKeyhole, MessageSquareText, ShieldCheck } from 'lucide-react';
 
 export default function Home() {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { y: 0, opacity: 1 }
-  };
-
   return (
-    <div className="space-y-24 pb-24">
-      {/* Hero Section */}
-      <section className="relative pt-12 md:pt-24 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <motion.div 
-              initial={{ x: -50, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ duration: 0.6 }}
-              className="text-left space-y-8"
-            >
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-health-green/10 text-health-green rounded-full font-semibold text-xs tracking-wider uppercase">
-                <CheckCircle2 className="w-4 h-4" />
-                Trusted Safety Monitoring
-              </div>
-              <h1 className="text-5xl md:text-7xl font-display font-bold leading-tight text-health-navy">
-                How are you <span className="bg-gradient-to-r from-health-green to-health-blue bg-clip-text text-transparent">feeling</span> after your shot?
-              </h1>
-              <p className="text-xl text-slate-600 leading-relaxed max-w-lg">
-                V-safe is a fast and easy way to check in after your vaccination. Report symptoms, track your health, and help build a safer future for everyone.
+    <div className="bg-slate-100 pb-14">
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="grid gap-10 bg-white px-6 py-10 shadow-sm md:grid-cols-[1.15fr_0.85fr] md:px-10 lg:px-12">
+          <div className="max-w-3xl">
+            <h1 className="text-4xl font-black tracking-tight text-slate-950 md:text-5xl">
+              Sign up for V-safe!
+            </h1>
+            <p className="mt-7 text-2xl font-black leading-snug text-slate-900">
+              CDC wants to know how you feel after vaccination.
+            </p>
+            <div className="mt-10 space-y-8 text-xl leading-9 text-slate-700">
+              <p>
+                Vaccine safety is a top priority for the Centers for Disease Control and Prevention (CDC).
               </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link to="/check-in" className="btn-primary flex items-center justify-center gap-2">
-                  <ShieldCheck className="w-5 h-5" />
-                  Register with V-safe
-                </Link>
-                <Link to="/emergency" className="btn-secondary flex items-center justify-center gap-2">
-                  Emergency Support
-                </Link>
-              </div>
-              <div className="flex items-center gap-4 pt-4 text-sm text-slate-500 font-medium">
-                <div className="flex -space-x-2">
-                  {[1, 2, 3].map(i => (
-                    <img key={i} src={`https://picsum.photos/seed/user${i}/40/40`} className="w-8 h-8 rounded-full border-2 border-white" aria-hidden="true" referrerPolicy="no-referrer" />
-                  ))}
-                </div>
-                <span>Join millions participating in public health safety.</span>
-              </div>
-            </motion.div>
+              <p>
+                V-safe is a vaccine safety monitoring system that lets you tell CDC how you feel after a vaccination by completing short check-ins.
+              </p>
+            </div>
 
-            <motion.div
-              initial={{ x: 50, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="relative"
-            >
-              <div className="absolute -inset-4 bg-health-blue/10 blur-3xl rounded-full" />
-              <div className="relative glass-card border-slate-200 p-4 md:p-8 rounded-2xl md:rounded-[2.5rem] shadow-2xl">
-                <img 
-                  src="https://picsum.photos/seed/healthcare/800/600" 
-                  alt="Healthy people smiling" 
-                  className="rounded-xl md:rounded-[1.5rem] w-full object-cover aspect-video shadow-inner"
-                  referrerPolicy="no-referrer"
-                />
-                <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-2xl shadow-xl border border-slate-100 hidden md:block">
-                  <div className="flex items-center gap-4">
-                    <div className="bg-health-green p-3 rounded-xl text-white">
-                      <Activity className="w-6 h-6" />
+            <div className="mt-10">
+              <p className="text-xl font-black text-slate-950">Do you have a V-safe account?</p>
+              <div className="mt-7 flex flex-col gap-4 sm:flex-row">
+                <button className="rounded border-2 border-health-blue bg-white px-5 py-3 text-lg font-black text-health-blue shadow-sm transition hover:bg-blue-50">
+                  Yes, let me log in
+                </button>
+                <Link to="/check-in" className="rounded bg-health-blue px-6 py-3 text-center text-lg font-bold text-white shadow-md transition hover:bg-blue-600">
+                  No, let me register
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-center">
+            <div className="w-full max-w-md border border-slate-200 bg-[#eee7f6] p-6 shadow-sm">
+              <div className="grid gap-4 sm:grid-cols-[1fr_120px]">
+                <div className="space-y-4">
+                  {[
+                    '2 minutes',
+                    '12 check-ins',
+                    '6 weeks',
+                  ].map(item => (
+                    <div key={item} className="flex items-center gap-3 text-2xl font-black text-slate-950">
+                      <CheckCircle2 className="h-8 w-8 text-health-green" />
+                      {item}
                     </div>
-                    <div>
-                      <div className="text-sm font-bold text-slate-800">Health Status</div>
-                      <div className="text-xs text-health-green font-semibold">Monitoring Active</div>
-                    </div>
+                  ))}
+                  <p className="pt-2 text-lg font-black leading-7 text-slate-900">
+                    To help CDC monitor vaccine safety.
+                  </p>
+                </div>
+                <div className="hidden items-end justify-center sm:flex">
+                  <div className="flex h-36 w-24 items-center justify-center rounded-t-[4rem] bg-white/70 text-health-blue shadow-inner">
+                    <MessageSquareText className="h-14 w-14" />
                   </div>
                 </div>
               </div>
-            </motion.div>
+              <div className="mt-8 flex items-center gap-3">
+                <div className="text-4xl font-black text-slate-950">V-safe</div>
+                <div className="flex -space-x-2">
+                  <div className="h-5 w-10 skew-x-[-28deg] bg-health-green" />
+                  <div className="h-5 w-10 skew-x-[-28deg] bg-health-blue" />
+                  <div className="h-5 w-10 skew-x-[-28deg] bg-health-purple" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="max-w-7xl mx-auto px-4">
-        <motion.div 
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-8"
-        >
-          <motion.div variants={itemVariants} className="glass-card p-10 hover:border-health-purple/50 transition-all group">
-            <div className="bg-health-purple/10 p-4 rounded-2xl w-fit mb-6 text-health-purple group-hover:bg-health-purple group-hover:text-white transition-all">
-              <ShieldCheck className="w-8 h-8" />
-            </div>
-            <h3 className="text-2xl font-bold mb-4">Secure Privacy</h3>
-            <p className="text-slate-600 leading-relaxed">
-              Your health information is protected by industry-standard encryption. We prioritize your data safety above all else.
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid gap-10 bg-white px-6 py-12 shadow-sm lg:grid-cols-[0.85fr_1.15fr] lg:px-12">
+          <div className="border-l-4 border-health-blue pl-6">
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-health-blue">About Us</p>
+            <h2 className="mt-3 text-4xl font-black tracking-tight text-slate-950">What V-safe does</h2>
+          </div>
+          <div className="space-y-6 text-lg leading-8 text-slate-700">
+            <p>
+              V-safe is part of the U.S. vaccine safety system that monitors the safety of vaccines. This demo organizes the experience around registration, short check-ins, and clear support information.
             </p>
-          </motion.div>
-
-          <motion.div variants={itemVariants} className="glass-card p-10 hover:border-health-blue/50 transition-all group">
-            <div className="bg-health-blue/10 p-4 rounded-2xl w-fit mb-6 text-health-blue group-hover:bg-health-blue group-hover:text-white transition-all">
-              <HeartPulse className="w-8 h-8" />
-            </div>
-            <h3 className="text-2xl font-bold mb-4">Daily Check-ins</h3>
-            <p className="text-slate-600 leading-relaxed">
-              Share how you feel after vaccination with simple surveys. Your feedback helps ensure vaccines remain safe for everyone.
+            <p>
+              The assistant in this prototype helps users move through the site, find general V-safe information, and locate student vaccine requirement resources.
             </p>
-          </motion.div>
-
-          <motion.div variants={itemVariants} className="glass-card p-10 hover:border-health-green/50 transition-all group">
-            <div className="bg-health-green/10 p-4 rounded-2xl w-fit mb-6 text-health-green group-hover:bg-health-green group-hover:text-white transition-all">
-              <MessageSquare className="w-8 h-8" />
-            </div>
-            <h3 className="text-2xl font-bold mb-4">Instant Guidance</h3>
-            <p className="text-slate-600 leading-relaxed">
-              Our intelligent Health Assistant is available to answer common questions and provide public health resources instantly.
-            </p>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </section>
 
-      {/* Emergency Section Info */}
-      <section className="max-w-7xl mx-auto px-4">
-        <div className="bg-slate-900 text-white rounded-[2rem] p-10 md:p-20 flex flex-col md:flex-row items-center gap-12">
-          <div className="flex-1 space-y-6">
-            <h2 className="text-3xl md:text-5xl font-bold leading-tight">Safety awareness is our priority</h2>
-            <p className="text-slate-300 text-lg">
-              Understanding vaccine side effects is key to your Peace of mind. We provide the tools to monitor your health and access immediate support when needed.
-            </p>
-            <Link to="/emergency" className="btn-secondary">
-              Emergency Guidance
-            </Link>
-          </div>
-          <div className="flex-1 grid grid-cols-2 gap-4">
-            <div className="bg-white/5 p-6 rounded-xl border border-white/10">
-              <div className="text-health-green font-bold text-lg mb-2">Common</div>
-              <p className="text-sm text-slate-400">Sore arm, mild fatigue, low-grade headache.</p>
-            </div>
-            <div className="bg-white/5 p-6 rounded-xl border border-white/10">
-              <div className="text-health-purple font-bold text-lg mb-2">Monitor</div>
-              <p className="text-sm text-slate-400">Report changes through our daily check-ins.</p>
-            </div>
-            <div className="bg-white/5 p-6 rounded-xl border border-white/10 col-span-2">
-              <div className="text-red-400 font-bold text-lg mb-2">Urgent</div>
-              <p className="text-sm text-slate-400">Difficulty breathing or sudden chest pain requires immediate care.</p>
-            </div>
-          </div>
+      <section className="mx-auto max-w-7xl px-4 pt-8 sm:px-6 lg:px-8">
+        <div className="grid gap-6 md:grid-cols-3">
+          {[
+            {
+              icon: ClipboardList,
+              title: 'How it works',
+              body: 'Register your vaccine information, complete short health check-ins, and review guidance when you need it.',
+              to: '/how-it-works',
+            },
+            {
+              icon: ShieldCheck,
+              title: 'Safety monitoring',
+              body: 'Reported symptoms help safety teams understand trends and support public health monitoring.',
+              to: '/data',
+            },
+            {
+              icon: LockKeyhole,
+              title: 'Data privacy',
+              body: 'The demo explains what information may be collected and how privacy expectations are communicated.',
+              to: '/privacy',
+            },
+          ].map(item => {
+            const Icon = item.icon;
+            return (
+              <Link key={item.title} to={item.to} className="group border border-slate-200 bg-white p-7 shadow-sm transition hover:-translate-y-0.5 hover:border-health-blue/40 hover:shadow-md">
+                <Icon className="h-9 w-9 text-health-blue" />
+                <h3 className="mt-5 text-2xl font-black text-slate-950">{item.title}</h3>
+                <p className="mt-4 text-base leading-7 text-slate-600">{item.body}</p>
+                <div className="mt-6 inline-flex items-center gap-2 text-sm font-black text-health-blue">
+                  Learn more
+                  <CalendarCheck2 className="h-4 w-4 transition group-hover:translate-x-1" />
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </section>
     </div>
