@@ -1,7 +1,11 @@
 import { Link } from 'react-router-dom';
 import { CalendarCheck2, CheckCircle2, ClipboardList, LockKeyhole, MessageSquareText, ShieldCheck } from 'lucide-react';
 
-export default function Home() {
+interface HomeProps {
+  onOpenAuth: (mode: 'login' | 'register') => void;
+}
+
+export default function Home({ onOpenAuth }: HomeProps) {
   return (
     <div className="bg-slate-100 pb-14">
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -25,12 +29,12 @@ export default function Home() {
             <div className="mt-10">
               <p className="text-xl font-black text-slate-950">Do you have a V-safe account?</p>
               <div className="mt-7 flex flex-col gap-4 sm:flex-row">
-                <button className="rounded border-2 border-health-blue bg-white px-5 py-3 text-lg font-black text-health-blue shadow-sm transition hover:bg-blue-50">
+                <button onClick={() => onOpenAuth('login')} className="rounded border-2 border-health-blue bg-white px-5 py-3 text-lg font-black text-health-blue shadow-sm transition hover:bg-blue-50">
                   Yes, let me log in
                 </button>
-                <Link to="/check-in" className="rounded bg-health-blue px-6 py-3 text-center text-lg font-bold text-white shadow-md transition hover:bg-blue-600">
+                <button onClick={() => onOpenAuth('register')} className="rounded bg-health-blue px-6 py-3 text-center text-lg font-bold text-white shadow-md transition hover:bg-blue-600">
                   No, let me register
-                </Link>
+                </button>
               </div>
             </div>
           </div>

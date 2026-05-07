@@ -7,9 +7,10 @@ import VSafeLogo from '../common/VSafeLogo';
 interface HeaderProps {
   isChatOpen: boolean;
   onToggleChat: () => void;
+  onOpenAuth: (mode: 'login' | 'register') => void;
 }
 
-export default function Header({ isChatOpen, onToggleChat }: HeaderProps) {
+export default function Header({ isChatOpen, onToggleChat, onOpenAuth }: HeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
@@ -44,15 +45,15 @@ export default function Header({ isChatOpen, onToggleChat }: HeaderProps) {
                 <ChevronDown className="w-4 h-4" />
               </button>
               <div className="hidden h-6 w-px bg-slate-200 lg:block" />
-              <button className="whitespace-nowrap rounded border-2 border-slate-200 px-3 py-2.5 text-xs font-black text-health-navy transition-all hover:border-health-blue/30 hover:bg-slate-50 lg:px-5 lg:py-3 lg:text-sm">
+              <button onClick={() => onOpenAuth('login')} className="whitespace-nowrap rounded border-2 border-slate-200 px-3 py-2.5 text-xs font-black text-health-navy transition-all hover:border-health-blue/30 hover:bg-slate-50 lg:px-5 lg:py-3 lg:text-sm">
                 Log In
               </button>
-              <Link
-                to="/check-in"
+              <button
+                onClick={() => onOpenAuth('register')}
                 className="whitespace-nowrap rounded bg-health-blue px-4 py-2.5 text-xs font-black text-white shadow-md shadow-blue-100 transition-all hover:bg-blue-600 lg:px-7 lg:py-3 lg:text-sm"
               >
                 Register Now
-              </Link>
+              </button>
               <button
                 onClick={onToggleChat}
                 className={`group relative overflow-hidden rounded-full border-2 px-3 py-2.5 text-xs font-black shadow-sm transition-all active:scale-[0.98] lg:px-5 lg:py-3 lg:text-sm ${
@@ -108,8 +109,8 @@ export default function Header({ isChatOpen, onToggleChat }: HeaderProps) {
         <div className="md:hidden bg-white border-b border-slate-200 overflow-y-auto max-h-[calc(100vh-80px)]">
           <div className="px-4 py-6 space-y-4">
             <div className="grid grid-cols-2 gap-3 mb-4">
-              <button className="text-sm font-bold text-health-navy border-2 border-slate-200 py-3 rounded-lg hover:bg-slate-50 transition-all text-center">Log In</button>
-              <Link to="/check-in" onClick={() => setIsOpen(false)} className="bg-health-blue text-white py-3 rounded-lg font-bold text-sm text-center shadow-md shadow-blue-50">Register Now</Link>
+              <button onClick={() => { setIsOpen(false); onOpenAuth('login'); }} className="text-sm font-bold text-health-navy border-2 border-slate-200 py-3 rounded-lg hover:bg-slate-50 transition-all text-center">Log In</button>
+              <button onClick={() => { setIsOpen(false); onOpenAuth('register'); }} className="bg-health-blue text-white py-3 rounded-lg font-bold text-sm text-center shadow-md shadow-blue-50">Register Now</button>
             </div>
             
             <button

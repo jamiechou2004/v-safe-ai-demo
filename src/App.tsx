@@ -3,6 +3,7 @@ import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import HealthAssistant from './components/chat/HealthAssistant';
+import DemoAuthModal from './components/common/DemoAuthModal';
 import Home from './pages/Home';
 import CheckIn from './pages/CheckIn';
 import Emergency from './pages/Emergency';
@@ -15,14 +16,19 @@ import Participants from './pages/Participants';
 
 export default function App() {
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'register' | null>(null);
 
   return (
     <Router>
       <div className="flex flex-col min-h-screen">
-        <Header isChatOpen={isChatOpen} onToggleChat={() => setIsChatOpen(open => !open)} />
+        <Header
+          isChatOpen={isChatOpen}
+          onToggleChat={() => setIsChatOpen(open => !open)}
+          onOpenAuth={setAuthMode}
+        />
         <main className="flex-grow">
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Home onOpenAuth={setAuthMode} />} />
             <Route path="/check-in" element={<CheckIn />} />
             <Route path="/emergency" element={<Emergency />} />
             <Route path="/privacy" element={<Privacy />} />
@@ -35,6 +41,7 @@ export default function App() {
         </main>
         <Footer />
         <HealthAssistant isOpen={isChatOpen} setIsOpen={setIsChatOpen} />
+        <DemoAuthModal mode={authMode} onClose={() => setAuthMode(null)} />
       </div>
     </Router>
   );
