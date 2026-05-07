@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2, MessageSquare, ChevronRight, ExternalLink, MapPinned, ShieldCheck, Sparkles } from 'lucide-react';
+import { X, Send, Loader2, MessageSquare, ChevronRight, ExternalLink, MapPinned, ShieldCheck, Sparkles, Minimize2, Maximize2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
 import { useNavigate } from 'react-router-dom';
@@ -169,6 +169,7 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isCompact, setIsCompact] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
@@ -240,46 +241,61 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsOpen(false)}
-              className="fixed inset-0 bg-slate-950/10 z-50 pointer-events-auto"
-            />
+            {!isCompact && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsOpen(false)}
+                className="fixed inset-0 bg-slate-950/10 z-50 pointer-events-auto"
+              />
+            )}
             
             {/* Chat Panel */}
             <motion.div
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
+              initial={isCompact ? { opacity: 0, y: 24, scale: 0.96 } : { x: '100%' }}
+              animate={isCompact ? { opacity: 1, y: 0, scale: 1 } : { x: 0 }}
+              exit={isCompact ? { opacity: 0, y: 24, scale: 0.96 } : { x: '100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 260 }}
-              className="fixed top-0 right-0 bottom-0 w-full border-l border-slate-200 bg-white md:w-[430px] shadow-2xl shadow-slate-950/15 z-50 flex flex-col pointer-events-auto"
+              className={`fixed right-0 z-50 flex flex-col border-slate-200 bg-white shadow-2xl shadow-slate-950/15 pointer-events-auto ${
+                isCompact
+                  ? 'bottom-4 mx-4 h-[620px] max-h-[calc(100vh-2rem)] w-[calc(100vw-2rem)] max-w-[430px] overflow-hidden rounded-2xl border md:right-5 md:bottom-5 md:mx-0'
+                  : 'top-0 bottom-0 w-full border-l md:w-[430px]'
+              }`}
             >
-              <div className="border-b border-slate-200 bg-white px-5 py-4">
+              <div className={`border-b border-slate-200 bg-white ${isCompact ? 'px-4 py-3' : 'px-5 py-4'}`}>
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="relative flex h-12 w-12 items-center justify-center rounded-full border border-health-blue/70 bg-blue-50 text-health-blue shadow-sm shadow-blue-100">
-                      <span className="absolute left-1 h-7 w-1 rounded-full bg-health-green" />
-                      <MessageSquare className="h-5 w-5" />
+                    <div className={`relative flex items-center justify-center rounded-full border border-health-blue/70 bg-blue-50 text-health-blue shadow-sm shadow-blue-100 ${isCompact ? 'h-10 w-10' : 'h-12 w-12'}`}>
+                      <span className={`absolute left-1 rounded-full bg-health-green ${isCompact ? 'h-6 w-1' : 'h-7 w-1'}`} />
+                      <MessageSquare className={isCompact ? 'h-4 w-4' : 'h-5 w-5'} />
                       <Sparkles className="absolute -right-1 -top-1 h-4 w-4 text-health-purple" />
                     </div>
                     <div>
                       <p className="text-[11px] font-black uppercase tracking-[0.22em] text-slate-400">V-safe AI demo</p>
-                      <h2 className="text-xl font-black tracking-tight text-health-navy">Ask V-safe AI</h2>
+                      <h2 className={`${isCompact ? 'text-lg' : 'text-xl'} font-black tracking-tight text-health-navy`}>Ask V-safe AI</h2>
                       <p className="mt-0.5 text-xs font-semibold text-slate-500">Navigation, check-in support, and campus vaccine links</p>
                     </div>
                   </div>
-                  <button 
-                    onClick={() => setIsOpen(false)}
-                    className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
-                    aria-label="Close assistant"
-                  >
-                    <X className="h-5 w-5" />
-                  </button>
+                  <div className="flex shrink-0 items-center gap-1">
+                    <button
+                      onClick={() => setIsCompact(value => !value)}
+                      className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-blue-50 hover:text-health-blue"
+                      aria-label={isCompact ? 'Expand assistant' : 'Use compact assistant window'}
+                      title={isCompact ? 'Expand assistant' : 'Small window mode'}
+                    >
+                      {isCompact ? <Maximize2 className="h-5 w-5" /> : <Minimize2 className="h-5 w-5" />}
+                    </button>
+                    <button 
+                      onClick={() => setIsOpen(false)}
+                      className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+                      aria-label="Close assistant"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
                 </div>
-                <div className="mt-4 flex items-center gap-2 rounded-lg border border-health-blue/15 bg-health-blue/5 px-3 py-2 text-xs font-semibold text-health-navy">
+                <div className={`${isCompact ? 'mt-3' : 'mt-4'} flex items-center gap-2 rounded-lg border border-health-blue/15 bg-health-blue/5 px-3 py-2 text-xs font-semibold text-health-navy`}>
                   <ShieldCheck className="h-4 w-4 text-health-green" />
                   Routes pages, explains V-safe, and surfaces university vaccine links
                 </div>
