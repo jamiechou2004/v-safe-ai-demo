@@ -28,34 +28,34 @@ export default function Header({ isChatOpen, onToggleChat }: HeaderProps) {
       <StudentDisclaimer />
       
       {/* Top Header - White */}
-      <div className="bg-white py-4 md:py-6 border-b border-slate-100">
+      <div className="border-b border-slate-100 bg-white py-3 sm:py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between gap-6">
+          <div className="flex min-h-[72px] items-center justify-between gap-4">
             {/* Logo Area */}
-            <Link id="logo-link" to="/" className="flex items-center">
-              <VSafeLogo />
+            <Link id="logo-link" to="/" className="flex min-w-0 shrink items-center">
+              <VSafeLogo className="max-w-[190px] sm:max-w-[240px] lg:max-w-[280px]" />
             </Link>
 
             {/* Top Right Utilities */}
-            <div className="hidden items-center gap-4 md:flex">
-              <button className="flex items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-health-navy transition-colors">
+            <div className="hidden min-w-0 shrink-0 items-center gap-2 md:flex lg:gap-4">
+              <button className="flex items-center gap-1.5 whitespace-nowrap text-xs font-semibold text-slate-600 transition-colors hover:text-health-navy lg:text-sm">
                 <Globe className="w-4 h-4" />
                 English
                 <ChevronDown className="w-4 h-4" />
               </button>
-              <div className="h-6 w-px bg-slate-200" />
-              <button className="rounded border-2 border-slate-200 px-5 py-3 text-sm font-black text-health-navy transition-all hover:border-health-blue/30 hover:bg-slate-50">
+              <div className="hidden h-6 w-px bg-slate-200 lg:block" />
+              <button className="whitespace-nowrap rounded border-2 border-slate-200 px-3 py-2.5 text-xs font-black text-health-navy transition-all hover:border-health-blue/30 hover:bg-slate-50 lg:px-5 lg:py-3 lg:text-sm">
                 Log In
               </button>
               <Link
                 to="/check-in"
-                className="rounded bg-health-blue px-7 py-3 text-sm font-black text-white shadow-md shadow-blue-100 transition-all hover:bg-blue-600"
+                className="whitespace-nowrap rounded bg-health-blue px-4 py-2.5 text-xs font-black text-white shadow-md shadow-blue-100 transition-all hover:bg-blue-600 lg:px-7 lg:py-3 lg:text-sm"
               >
                 Register Now
               </Link>
               <button
                 onClick={onToggleChat}
-                className={`group relative overflow-hidden rounded-full border-2 px-5 py-3 text-sm font-black shadow-sm transition-all active:scale-[0.98] ${
+                className={`group relative overflow-hidden rounded-full border-2 px-3 py-2.5 text-xs font-black shadow-sm transition-all active:scale-[0.98] lg:px-5 lg:py-3 lg:text-sm ${
                   isChatOpen
                     ? 'border-health-navy bg-health-navy text-white'
                     : 'border-health-blue bg-white text-health-navy hover:border-health-purple hover:shadow-md'
@@ -84,13 +84,13 @@ export default function Header({ isChatOpen, onToggleChat }: HeaderProps) {
 
       {/* Main Navigation - Blue */}
       <nav className="hidden md:block bg-health-blue">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center">
+        <div className="mx-auto max-w-7xl overflow-x-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex min-w-max items-center">
             {mainNavItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`px-3 py-3 text-[12px] font-bold tracking-wide transition-all lg:px-4 lg:text-[13px] ${
+                className={`whitespace-nowrap px-3 py-3 text-[12px] font-bold tracking-wide transition-all lg:px-4 lg:text-[13px] ${
                   location.pathname === item.path 
                     ? 'text-white border-b-4 border-white bg-white/10' 
                     : 'text-blue-50 border-b-4 border-transparent hover:text-white hover:bg-white/10'
