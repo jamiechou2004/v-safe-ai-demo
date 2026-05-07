@@ -145,7 +145,7 @@ function getAssistantIntent(message: string): AssistantIntent | null {
   const route = ROUTE_RESPONSES.find(item => item.keywords.some(keyword => normalized.includes(keyword)));
   if (route) {
     return {
-      response: `I can guide you to **${route.label}**. Would you like me to open that page now?`,
+      response: `I found the right page for this: **${route.label}**.\n\nI will only open it if you confirm.`,
       navigateTo: route.path,
       navigateLabel: route.label,
     };
@@ -328,13 +328,13 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                         className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                       >
                         <div
-                          className={`max-w-[86%] px-4 py-3 text-sm leading-6 shadow-sm ${
+                          className={`max-w-[86%] overflow-hidden text-sm leading-6 shadow-sm ${
                             msg.role === 'user'
-                              ? 'rounded-2xl rounded-tr-md bg-health-blue text-white'
+                              ? 'rounded-2xl rounded-tr-md bg-health-blue px-4 py-3 text-white'
                               : 'rounded-2xl rounded-tl-md border border-slate-200 bg-white text-slate-800'
                           }`}
                         >
-                          <div className="markdown-body leading-6">
+                          <div className={`markdown-body leading-6 ${msg.role === 'assistant' ? 'px-4 py-3' : ''}`}>
                             <ReactMarkdown
                               components={{
                                 a: ({ children, href }) => (
@@ -347,33 +347,38 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                               {msg.content}
                             </ReactMarkdown>
                           </div>
+                          {msg.role === 'assistant' && msg.action && (
+                            <div className="border-t border-slate-200 bg-slate-50 px-3 py-3">
+                              <div className="mb-2 text-[11px] font-black uppercase tracking-[0.16em] text-slate-400">
+                                Permission required
+                              </div>
+                              <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto]">
+                                <button
+                                  onClick={() => handleConfirmNavigation(msg)}
+                                  className="inline-flex items-center justify-center gap-2 rounded bg-health-blue px-3 py-2.5 text-xs font-black text-white transition hover:bg-blue-600"
+                                >
+                                  {msg.action.label}
+                                  <ChevronRight className="h-3.5 w-3.5" />
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    setMessages(prev => [
+                                      ...prev,
+                                      {
+                                        id: `${Date.now()}-stay`,
+                                        role: 'assistant',
+                                        content: 'No problem. I will stay on this page and keep helping here.',
+                                      },
+                                    ])
+                                  }
+                                  className="inline-flex items-center justify-center rounded border border-slate-300 bg-white px-3 py-2.5 text-xs font-black text-slate-600 transition hover:bg-slate-50"
+                                >
+                                  Stay here
+                                </button>
+                              </div>
+                            </div>
+                          )}
                         </div>
-                        {msg.role === 'assistant' && msg.action && (
-                          <div className="mt-2 flex flex-wrap gap-2">
-                            <button
-                              onClick={() => handleConfirmNavigation(msg)}
-                              className="inline-flex items-center gap-2 rounded border border-health-blue bg-health-blue px-3 py-2 text-xs font-black text-white transition hover:bg-blue-600"
-                            >
-                              {msg.action.label}
-                              <ChevronRight className="h-3.5 w-3.5" />
-                            </button>
-                            <button
-                              onClick={() =>
-                                setMessages(prev => [
-                                  ...prev,
-                                  {
-                                    id: `${Date.now()}-stay`,
-                                    role: 'assistant',
-                                    content: 'No problem. I will stay on this page and keep helping here.',
-                                  },
-                                ])
-                              }
-                              className="inline-flex items-center rounded border border-slate-300 bg-white px-3 py-2 text-xs font-black text-slate-600 transition hover:bg-slate-50"
-                            >
-                              Stay here
-                            </button>
-                          </div>
-                        )}
                       </div>
                     ))}
                     {isLoading && (
