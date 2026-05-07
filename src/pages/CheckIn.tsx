@@ -115,13 +115,13 @@ export default function CheckIn() {
       <div className="space-y-4">
         <label className="text-sm font-bold text-slate-700">Clinic, Pharmacy, or City</label>
         <div className="relative">
-          <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+          <MapPin className="pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
           <input 
             type="text" 
             placeholder="e.g. Health Center, CVS, New York"
             value={formData.location}
             onChange={(e) => setFormData({...formData, location: e.target.value})}
-            className="input-field pl-12"
+            className="input-field pl-14"
           />
         </div>
         <div className="p-5 bg-health-blue/5 rounded-xl border border-health-blue/10 flex gap-3">
