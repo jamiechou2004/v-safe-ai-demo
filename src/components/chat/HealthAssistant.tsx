@@ -63,16 +63,16 @@ const universityVaccineLinks = [
 
 const COLLEGE_VACCINE_INFO = `I am an AI assistant, not a doctor.
 
-College vaccine requirements depend on your school and state, so the most accurate source is your university's student health or immunization requirements page. For general U.S. guidance, start here:
+College vaccine requirements can be different for every university, program, state, and student status. The most accurate source is always your university's own student health or immunization requirements page.
+
+Tell me the university name, and I can check whether this demo has a direct official immunization link for that school.
+
+For general U.S. guidance, start here:
 
 - [CDC vaccines by age](https://www.cdc.gov/vaccines/by-age/index.html)
 - [CDC adult immunization schedule](https://www.cdc.gov/vaccines/imz-schedules/adult-easyread.html)
 
-Common college requirements often include MMR, Tdap, meningococcal vaccines, hepatitis B, and varicella, but your university's own requirement page is the one to follow.
-
-Here are 20 official university immunization requirement pages:
-
-${universityVaccineLinks.map((school, index) => `${index + 1}. [${school.name}](${school.url})`).join('\n')}`;
+Common college requirements often include MMR, Tdap, meningococcal vaccines, hepatitis B, and varicella, but your university's own page is the one to follow.`;
 
 const ROUTE_RESPONSES: { path: string; label: string; keywords: string[] }[] = [
   {
@@ -137,7 +137,7 @@ For **${matchedSchool.name}**, this is the official university page specifically
 [${matchedSchool.name} immunization requirements](${matchedSchool.url})
 
 Requirements can change by program, residency status, and term, so use that university page as the source of truth.`,
-      suggestions: ['Show all 20 university links', 'What vaccines do college students need?', 'Take me to sign up'],
+      suggestions: ['Ask about another university', 'What vaccines do college students need?', 'Take me to sign up'],
     };
   }
 
@@ -152,7 +152,7 @@ Requirements can change by program, residency status, and term, so use that univ
   ) {
     return {
       response: COLLEGE_VACCINE_INFO,
-      suggestions: ['Ask about UCLA requirements', 'Ask about MIT requirements', 'Take me to sign up'],
+      suggestions: ['Ask about UCLA requirements', 'Ask about MIT requirements', 'Ask about Harvard requirements'],
     };
   }
 
@@ -341,10 +341,10 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                         <ExternalLink className="w-4 h-4 text-health-purple group-hover:translate-x-1 transition-transform" />
                       </button>
                       <button 
-                        onClick={() => handleSend("Show me official university vaccine requirement links")}
+                        onClick={() => handleSend("Can you find UCLA vaccine requirements?")}
                         className="group flex w-full items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-bold text-health-navy shadow-sm transition hover:border-health-blue/40 hover:bg-blue-50/40"
                       >
-                        <span>20 university vaccine links</span>
+                        <span>Ask about a specific university</span>
                         <ExternalLink className="w-4 h-4 text-health-purple group-hover:translate-x-1 transition-transform" />
                       </button>
                       <button 
