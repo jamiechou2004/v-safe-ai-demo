@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2, MessageSquare, ChevronRight, ExternalLink, MapPinned, ShieldCheck, Sparkles, Minimize2, Maximize2 } from 'lucide-react';
+import { X, Send, Loader2, MessageSquare, ChevronRight, ExternalLink, MapPinned, ShieldCheck, Sparkles, Minimize2, Maximize2, PanelRightOpen } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { getHealthAssistantResponse } from '../../services/geminiService';
 import { findUniversityByQuery, hasSchoolVaccineIntent } from '../../data/universities';
 
@@ -27,6 +27,47 @@ interface AssistantIntent {
   suggestions?: string[];
   navigateTo?: string;
   navigateLabel?: string;
+}
+
+interface PanelRect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+type ResizeHandle = 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw';
+
+const PANEL_MIN_WIDTH = 360;
+const PANEL_MIN_HEIGHT = 420;
+const PANEL_MARGIN = 16;
+
+function getDefaultPanelRect(): PanelRect {
+  if (typeof window === 'undefined') {
+    return { x: 0, y: 0, width: 440, height: 680 };
+  }
+
+  const width = Math.min(460, Math.max(PANEL_MIN_WIDTH, window.innerWidth - PANEL_MARGIN * 2));
+  const height = Math.min(680, Math.max(PANEL_MIN_HEIGHT, window.innerHeight - 120));
+  return {
+    x: Math.max(PANEL_MARGIN, window.innerWidth - width - 28),
+    y: Math.max(PANEL_MARGIN, window.innerHeight - height - 28),
+    width,
+    height,
+  };
+}
+
+function constrainPanelRect(rect: PanelRect): PanelRect {
+  if (typeof window === 'undefined') return rect;
+
+  const maxWidth = Math.max(PANEL_MIN_WIDTH, window.innerWidth - PANEL_MARGIN * 2);
+  const maxHeight = Math.max(PANEL_MIN_HEIGHT, window.innerHeight - PANEL_MARGIN * 2);
+  const width = Math.min(Math.max(rect.width, PANEL_MIN_WIDTH), maxWidth);
+  const height = Math.min(Math.max(rect.height, PANEL_MIN_HEIGHT), maxHeight);
+  const x = Math.min(Math.max(rect.x, PANEL_MARGIN), window.innerWidth - width - PANEL_MARGIN);
+  const y = Math.min(Math.max(rect.y, PANEL_MARGIN), window.innerHeight - height - PANEL_MARGIN);
+
+  return { x, y, width, height };
 }
 
 const VSAFE_INFO = `Of course. V-safe is meant to make the after-vaccination follow-up feel simple instead of confusing.
@@ -100,7 +141,7 @@ const ROUTE_RESPONSES: { path: string; label: string; keywords: string[] }[] = [
   },
 ];
 
-function getAssistantIntent(message: string): AssistantIntent | null {
+function getAssistantIntent(message: string, currentPath: string): AssistantIntent | null {
   const normalized = message.toLowerCase();
   const matchedSchool = findUniversityByQuery(message);
 
@@ -170,8 +211,45 @@ I will look for that school's official immunization page first and avoid guessin
     };
   }
 
+  if (
+    currentPath === '/check-in' &&
+    (
+      normalized.includes('what information') ||
+      normalized.includes('what do i need') ||
+      normalized.includes('which field') ||
+      normalized.includes('form help') ||
+      normalized.includes('表格') ||
+      normalized.includes('需要什么')
+    )
+  ) {
+    return {
+      response: `For **Sign up / Register**, start with the first section of the form.
+
+You will need:
+- Vaccine type
+- Dose number
+- Vaccination date
+- Clinic, pharmacy, or city
+- How you are feeling today
+
+This is a demo, so do not enter real sensitive medical information. If you are unsure, use realistic sample values.`,
+      suggestions: ['What is V-safe?', 'What vaccines do college students need?'],
+    };
+  }
+
   const route = ROUTE_RESPONSES.find(item => item.keywords.some(keyword => normalized.includes(keyword)));
   if (route) {
+    if (route.path === currentPath) {
+      return {
+        response: route.path === '/check-in'
+          ? `You are already on **Sign up / Register**.\n\nStart with the vaccine details at the top of the form. I can stay open while you complete it, and you can ask me if you are unsure which field to use.`
+          : `You are already on **${route.label}**.\n\nI will stay here while you review this page.`,
+        suggestions: route.path === '/check-in'
+          ? ['What information do I need?', 'What is V-safe?']
+          : ['What is V-safe?', 'Take me to sign up'],
+      };
+    }
+
     return {
       response: `I found the page that matches what you asked for: **${route.label}**.\n\nI can take you there, but I will wait for your confirmation first so the page does not change unexpectedly.`,
       suggestions: ['Stay here', 'What is V-safe?', 'Show privacy information'],
@@ -187,9 +265,18 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isCompact, setIsCompact] = useState(false);
+  const [isCompact, setIsCompact] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [panelRect, setPanelRect] = useState<PanelRect>(() => getDefaultPanelRect());
+  const [isDesktop, setIsDesktop] = useState(() => typeof window === 'undefined' ? true : window.innerWidth >= 768);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const panelRectRef = useRef(panelRect);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    panelRectRef.current = panelRect;
+  }, [panelRect]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -213,6 +300,81 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
     };
   }, [isOpen, isCompact]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 768);
+      setPanelRect(rect => constrainPanelRect(rect));
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const handlePanelDragStart = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!isCompact || !isDesktop || isCollapsed || event.button !== 0) return;
+    const target = event.target as HTMLElement;
+    if (target.closest('button, a, textarea, input')) return;
+
+    event.currentTarget.setPointerCapture(event.pointerId);
+    const startX = event.clientX;
+    const startY = event.clientY;
+    const startRect = panelRectRef.current;
+
+    const handleMove = (moveEvent: PointerEvent) => {
+      setPanelRect(constrainPanelRect({
+        ...startRect,
+        x: startRect.x + moveEvent.clientX - startX,
+        y: startRect.y + moveEvent.clientY - startY,
+      }));
+    };
+
+    const handleUp = () => {
+      window.removeEventListener('pointermove', handleMove);
+      window.removeEventListener('pointerup', handleUp);
+    };
+
+    window.addEventListener('pointermove', handleMove);
+    window.addEventListener('pointerup', handleUp);
+  };
+
+  const handleResizeStart = (handle: ResizeHandle) => (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!isCompact || isCollapsed || event.button !== 0) return;
+    event.preventDefault();
+    event.stopPropagation();
+
+    event.currentTarget.setPointerCapture(event.pointerId);
+    const startX = event.clientX;
+    const startY = event.clientY;
+    const startRect = panelRectRef.current;
+
+    const handleMove = (moveEvent: PointerEvent) => {
+      const dx = moveEvent.clientX - startX;
+      const dy = moveEvent.clientY - startY;
+      let nextRect = { ...startRect };
+
+      if (handle.includes('e')) nextRect.width = startRect.width + dx;
+      if (handle.includes('s')) nextRect.height = startRect.height + dy;
+      if (handle.includes('w')) {
+        nextRect.width = startRect.width - dx;
+        nextRect.x = startRect.x + dx;
+      }
+      if (handle.includes('n')) {
+        nextRect.height = startRect.height - dy;
+        nextRect.y = startRect.y + dy;
+      }
+
+      setPanelRect(constrainPanelRect(nextRect));
+    };
+
+    const handleUp = () => {
+      window.removeEventListener('pointermove', handleMove);
+      window.removeEventListener('pointerup', handleUp);
+    };
+
+    window.addEventListener('pointermove', handleMove);
+    window.addEventListener('pointerup', handleUp);
+  };
+
   const handleSend = async (text: string = input) => {
     const messageContent = text || input;
     if (!messageContent.trim() || isLoading) return;
@@ -222,7 +384,7 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
     setInput('');
     setIsLoading(true);
 
-    const intent = getAssistantIntent(messageContent);
+    const intent = getAssistantIntent(messageContent, location.pathname);
     if (intent) {
       const assistantMsg: Message = {
         id: (Date.now() + 1).toString(),
@@ -251,7 +413,10 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
 
   const getDefaultSuggestions = (msg: Message) => {
     if (msg.role !== 'assistant' || msg.action) return [];
-    return (msg.suggestions || ['Take me to sign up', 'What vaccines do college students need?']).slice(0, 2);
+    const suggestions = msg.suggestions || ['Take me to sign up', 'What vaccines do college students need?'];
+    return suggestions
+      .filter(suggestion => !(location.pathname === '/check-in' && suggestion.toLowerCase().includes('sign up')))
+      .slice(0, 2);
   };
 
   const handleConfirmNavigation = (message: Message) => {
@@ -264,7 +429,12 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
       {
         id: `${Date.now()}-nav`,
         role: 'assistant',
-        content: `Done - I opened **${openedLabel}**. I will stay here if you need anything else.`,
+        content: message.action.path === '/check-in'
+          ? `Done - I opened **${openedLabel}**.\n\nYou can begin with the vaccine type, dose, and vaccination date. I will stay here if you need help while filling it out.`
+          : `Done - I opened **${openedLabel}**. I will stay here if you need anything else.`,
+        suggestions: message.action.path === '/check-in'
+          ? ['What information do I need?', 'What is V-safe?']
+          : ['What is V-safe?', 'Take me to sign up'],
       },
     ]);
     window.setTimeout(() => {
@@ -293,13 +463,22 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
               animate={isCompact ? { opacity: 1, y: 0, scale: 1 } : { x: 0 }}
               exit={isCompact ? { opacity: 0, y: 24, scale: 0.96 } : { x: '100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 260 }}
-              className={`fixed right-0 z-50 flex flex-col border-slate-200/80 bg-white shadow-2xl shadow-slate-950/15 pointer-events-auto overscroll-contain ${
+              style={isCompact && isDesktop ? {
+                left: panelRect.x,
+                top: panelRect.y,
+                width: panelRect.width,
+                height: isCollapsed ? 96 : panelRect.height,
+              } : undefined}
+              className={`fixed z-50 flex flex-col border-slate-200/80 bg-white shadow-2xl shadow-slate-950/15 pointer-events-auto overscroll-contain ${
                 isCompact
-                  ? 'bottom-4 mx-4 h-[620px] max-h-[calc(100vh-2rem)] w-[calc(100vw-2rem)] max-w-[430px] overflow-hidden rounded-[1.75rem] border bg-white/95 shadow-[0_24px_70px_rgba(15,23,42,0.24)] backdrop-blur-2xl md:right-5 md:bottom-5 md:mx-0'
-                  : 'top-0 bottom-0 w-full border-l md:w-[460px]'
+                  ? `inset-x-3 bottom-3 ${isCollapsed ? 'h-auto' : 'h-[calc(100vh-1.5rem)]'} max-h-[calc(100vh-1.5rem)] overflow-hidden rounded-[1.75rem] border bg-white/95 shadow-[0_24px_70px_rgba(15,23,42,0.24)] backdrop-blur-2xl md:inset-auto md:h-auto`
+                  : 'top-0 right-0 bottom-0 w-full border-l md:w-[460px]'
               }`}
             >
-              <div className={`relative overflow-hidden border-b border-slate-200/80 bg-white/90 backdrop-blur-2xl ${isCompact ? 'px-4 py-3' : 'px-5 py-5'}`}>
+              <div
+                onPointerDown={handlePanelDragStart}
+                className={`relative overflow-hidden border-b border-slate-200/80 bg-white/90 backdrop-blur-2xl ${isCompact ? 'cursor-grab px-4 py-3 active:cursor-grabbing' : 'px-5 py-5'}`}
+              >
                 <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_16%_0%,rgba(52,147,214,0.14),transparent_34%),radial-gradient(circle_at_90%_18%,rgba(113,70,195,0.10),transparent_30%),linear-gradient(180deg,rgba(248,250,252,0.98),rgba(255,255,255,0.82))]" />
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-sky-200 to-transparent" />
                 <div className="relative flex items-start justify-between gap-4">
@@ -318,12 +497,31 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                   </div>
                   <div className="flex shrink-0 items-center gap-1">
                     <button
-                      onClick={() => setIsCompact(value => !value)}
+                      onClick={() => {
+                        if (!isCompact) {
+                          setIsCompact(true);
+                          setIsCollapsed(true);
+                          return;
+                        }
+                        setPanelRect(rect => constrainPanelRect(rect));
+                        setIsCollapsed(value => !value);
+                      }}
                       className="rounded-full border border-transparent p-2 text-slate-400 transition-all hover:border-slate-200 hover:bg-white/80 hover:text-health-blue hover:shadow-sm"
-                      aria-label={isCompact ? 'Expand assistant' : 'Use compact assistant window'}
-                      title={isCompact ? 'Expand assistant' : 'Small window mode'}
+                      aria-label={isCollapsed ? 'Expand assistant panel' : 'Collapse assistant panel'}
+                      title={isCollapsed ? 'Expand panel' : 'Collapse panel'}
                     >
-                      {isCompact ? <Maximize2 className="h-5 w-5" /> : <Minimize2 className="h-5 w-5" />}
+                      {isCollapsed ? <Maximize2 className="h-5 w-5" /> : <Minimize2 className="h-5 w-5" />}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsCollapsed(false);
+                        setIsCompact(value => !value);
+                      }}
+                      className="rounded-full border border-transparent p-2 text-slate-400 transition-all hover:border-slate-200 hover:bg-white/80 hover:text-health-blue hover:shadow-sm"
+                      aria-label={isCompact ? 'Dock assistant to side' : 'Use floating assistant panel'}
+                      title={isCompact ? 'Dock to side' : 'Floating panel'}
+                    >
+                      <PanelRightOpen className="h-5 w-5" />
                     </button>
                     <button 
                       onClick={() => setIsOpen(false)}
@@ -334,18 +532,18 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                     </button>
                   </div>
                 </div>
-                <div className={`relative ${isCompact ? 'mt-3' : 'mt-5'} rounded-2xl border border-white/80 bg-white/70 p-1 shadow-[inset_0_0_0_1px_rgba(148,163,184,0.12),0_10px_24px_rgba(15,23,42,0.05)]`}>
+                {!isCollapsed && <div className={`relative ${isCompact ? 'mt-3' : 'mt-5'} rounded-2xl border border-white/80 bg-white/70 p-1 shadow-[inset_0_0_0_1px_rgba(148,163,184,0.12),0_10px_24px_rgba(15,23,42,0.05)]`}>
                   <div className="flex items-center gap-2.5 rounded-[0.85rem] bg-slate-50/80 px-3 py-2 text-xs font-semibold leading-5 text-slate-700">
                     <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-health-green ring-1 ring-emerald-100">
                       <ShieldCheck className="h-4 w-4" />
                     </span>
                     <span>Guides pages, explains V-safe, and finds campus vaccine links</span>
                   </div>
-                </div>
+                </div>}
               </div>
 
               {/* Content Area */}
-              <div className="relative flex-1 overflow-y-auto overscroll-contain bg-[linear-gradient(180deg,#f8fbff_0%,#f6f8fb_42%,#ffffff_100%)] px-5 py-5">
+              {!isCollapsed && <div className="relative flex-1 overflow-y-auto overscroll-contain bg-[linear-gradient(180deg,#f8fbff_0%,#f6f8fb_42%,#ffffff_100%)] px-5 py-5">
                 <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-[radial-gradient(circle_at_50%_0%,rgba(52,147,214,0.10),transparent_65%)]" />
                 {messages.length === 0 ? (
                   <div className="relative space-y-5">
@@ -376,15 +574,15 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
 
                     <div className="space-y-2.5">
                       <button 
-                        onClick={() => handleSend("Take me to the sign up page")}
+                        onClick={() => handleSend(location.pathname === '/check-in' ? "What information do I need for this sign up form?" : "Take me to the sign up page")}
                         className="group flex w-full items-center gap-3 rounded-2xl border border-white/80 bg-white/82 px-4 py-3.5 text-left shadow-[0_10px_30px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/60 backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:ring-sky-200 hover:shadow-[0_18px_42px_rgba(52,147,214,0.14)]"
                       >
                         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-sky-50 text-health-blue ring-1 ring-sky-100">
                           <MapPinned className="h-5 w-5" />
                         </span>
                         <span className="min-w-0 flex-1">
-                          <span className="block text-sm font-black text-slate-950">Take me to sign up</span>
-                          <span className="mt-0.5 block text-xs font-semibold text-slate-500">I will ask before opening the page.</span>
+                          <span className="block text-sm font-black text-slate-950">{location.pathname === '/check-in' ? 'Help with this sign up' : 'Take me to sign up'}</span>
+                          <span className="mt-0.5 block text-xs font-semibold text-slate-500">{location.pathname === '/check-in' ? 'Get field-by-field guidance.' : 'I will ask before opening the page.'}</span>
                         </span>
                         <ChevronRight className="h-4 w-4 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-health-blue" />
                       </button>
@@ -512,10 +710,10 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                     <div ref={messagesEndRef} />
                   </div>
                 )}
-              </div>
+              </div>}
 
               {/* Input Area */}
-              <div className="border-t border-slate-200/80 bg-white/90 px-5 py-4 backdrop-blur-xl">
+              {!isCollapsed && <div className="border-t border-slate-200/80 bg-white/90 px-5 py-4 backdrop-blur-xl">
                 <div className="relative flex items-end gap-3">
                   <div className="flex-1 overflow-hidden rounded-[1.35rem] border border-slate-200/80 bg-slate-50/80 shadow-inner transition-all focus-within:border-sky-300 focus-within:bg-white focus-within:ring-4 focus-within:ring-sky-200/40">
                     <textarea
@@ -547,7 +745,19 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                   Demo only - Not medical advice
                   <span className="h-px w-8 bg-slate-200" />
                 </div>
-              </div>
+              </div>}
+              {isCompact && isDesktop && !isCollapsed && (
+                <>
+                  <div onPointerDown={handleResizeStart('n')} className="absolute inset-x-8 top-0 h-2 cursor-ns-resize" />
+                  <div onPointerDown={handleResizeStart('s')} className="absolute inset-x-8 bottom-0 h-2 cursor-ns-resize" />
+                  <div onPointerDown={handleResizeStart('e')} className="absolute inset-y-8 right-0 w-2 cursor-ew-resize" />
+                  <div onPointerDown={handleResizeStart('w')} className="absolute inset-y-8 left-0 w-2 cursor-ew-resize" />
+                  <div onPointerDown={handleResizeStart('nw')} className="absolute left-0 top-0 h-5 w-5 cursor-nwse-resize" />
+                  <div onPointerDown={handleResizeStart('ne')} className="absolute right-0 top-0 h-5 w-5 cursor-nesw-resize" />
+                  <div onPointerDown={handleResizeStart('sw')} className="absolute bottom-0 left-0 h-5 w-5 cursor-nesw-resize" />
+                  <div onPointerDown={handleResizeStart('se')} className="absolute bottom-0 right-0 h-5 w-5 cursor-nwse-resize" />
+                </>
+              )}
             </motion.div>
           </>
         )}
