@@ -1,28 +1,28 @@
 const fallbackResponses = [
-  `I am an AI assistant, not a doctor.
-
-For this demo, I can help you find the right V-safe page, explain what V-safe does, and point students to general vaccine requirement resources.
+  `I can help with that. This demo is built around the moments where people usually need a little direction: finding the right page, understanding V-safe, or checking vaccine requirement resources for school.
 
 Try asking:
 - "Take me to sign up"
 - "What is V-safe?"
 - "What vaccines do college students need?"
-- "Show me privacy information"`,
-  `I am an AI assistant, not a doctor.
+- "Show me privacy information"
 
-V-safe helps people complete short vaccine safety check-ins after vaccination. If your question is about symptoms, I can help you decide whether to report them or review emergency guidance.
+I will keep the steps clear and ask before opening a different page.`,
+  `If you are asking because you do not feel well after a vaccine, I can help you think through the next step.
 
-For severe symptoms like difficulty breathing, chest pain, face or throat swelling, or very high fever, seek emergency care immediately.`,
-  `I am an AI assistant, not a doctor.
+V-safe is for short check-ins after vaccination, so it is a good place to report how you are feeling. If symptoms sound serious, I can also point you to emergency guidance.
 
-This demo is focused on vaccine check-ins, V-safe information, privacy, emergency guidance, and college vaccine requirement resources. Ask me where you want to go, and I can route you there.`,
+For severe symptoms like difficulty breathing, chest pain, face or throat swelling, or a very high fever, seek emergency care immediately.`,
+  `I am here to help you move through the demo without guessing where things are.
+
+You can ask about check-ins, V-safe basics, privacy, emergency guidance, or a university's vaccine requirement page. If a request would move you to another page, I will ask for permission first.`,
 ];
 
 function chooseDemoResponse(message: string) {
   const normalized = message.toLowerCase();
 
   if (normalized.includes('symptom') || normalized.includes('fever') || normalized.includes('headache') || normalized.includes('sore')) {
-    return `I am an AI assistant, not a doctor.
+    return `I am sorry you are dealing with symptoms. I can help you decide what to do in the demo and when to look for urgent help.
 
 Mild symptoms like a sore arm, headache, fatigue, chills, or a low fever can happen after vaccination and often improve within 1-2 days.
 
@@ -30,9 +30,9 @@ You can use the check-in page to report how you feel. If symptoms are severe, un
   }
 
   if (normalized.includes('privacy') || normalized.includes('data') || normalized.includes('security')) {
-    return `I am an AI assistant, not a doctor.
+    return `That is a reasonable thing to check before sharing health information.
 
-V-safe uses health check-in information to support vaccine safety monitoring. In this student demo, no real government database is connected.
+V-safe uses health check-in information to support vaccine safety monitoring. In this student demo, no real government database is connected and no real medical record is being submitted.
 
 For the prototype, you can review the privacy page to see how the app explains data collection, use, and participant protections.`;
   }

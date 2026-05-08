@@ -29,28 +29,28 @@ interface AssistantIntent {
   navigateLabel?: string;
 }
 
-const VSAFE_INFO = `I am an AI assistant, not a doctor.
+const VSAFE_INFO = `Of course. V-safe is meant to make the after-vaccination follow-up feel simple instead of confusing.
 
-V-safe is a vaccine safety monitoring tool that lets people report how they feel after vaccination through short check-ins. It helps public health teams monitor vaccine safety and spot possible safety signals.
+The basic idea is: after someone gets vaccinated, they can complete short check-ins about how they feel. Those check-ins help public health teams watch for vaccine safety patterns and understand what people are experiencing.
 
-You can use this prototype to:
-- Sign up or register a vaccine check-in
-- Report symptoms after vaccination
-- Find emergency guidance
-- Review privacy and data safety information`;
+In this demo, I can help you with a few practical things:
+- Get to the sign up or check-in page
+- Understand what V-safe does in plain language
+- Find privacy and data safety information
+- Review emergency guidance if symptoms sound serious
 
-const COLLEGE_VACCINE_INFO = `I am an AI assistant, not a doctor.
+Small note: I can help explain and guide you through the demo, but I cannot replace medical advice from a clinician.`;
 
-College vaccine requirements can be different for every university, program, state, and student status. The most accurate source is always your university's own student health or immunization requirements page.
+const COLLEGE_VACCINE_INFO = `Yes, I can help with that. College vaccine requirements can feel hard to track because each school may set its own rules, forms, deadlines, and exemptions.
 
-Tell me the university name, and I can check whether this demo has a direct official immunization link for that school.
+The best next step is to tell me the university name. If it is in this demo database, I will give you that school's official immunization page and summarize what kind of requirements to look for.
 
-For general U.S. guidance, start here:
+For general U.S. vaccine guidance, these CDC pages are useful starting points:
 
 - [CDC vaccines by age](https://www.cdc.gov/vaccines/by-age/index.html)
 - [CDC adult immunization schedule](https://www.cdc.gov/vaccines/imz-schedules/adult-easyread.html)
 
-Common college requirements often include MMR, Tdap, meningococcal vaccines, hepatitis B, and varicella, but your university's own page is the one to follow.`;
+Common college requirements often include MMR, Tdap, meningococcal vaccines, hepatitis B, and varicella. Your university's own student health page is still the source of truth.`;
 
 const ROUTE_RESPONSES: { path: string; label: string; keywords: string[] }[] = [
   {
@@ -106,18 +106,18 @@ function getAssistantIntent(message: string): AssistantIntent | null {
 
   if (matchedSchool) {
     return {
-      response: `I am an AI assistant, not a doctor.
+      response: `I found a school-specific resource for you.
 
-For **${matchedSchool.name}**, this is the official university page specifically about student immunization or vaccine requirements:
+For **${matchedSchool.name}**, this is the official page to start with for student immunization or vaccine requirements:
 
 [${matchedSchool.name} immunization requirements](${matchedSchool.immunizationUrl})
 
-Common requirement categories in this demo database:
+What to look for on that page:
 ${matchedSchool.commonRequirementTags.map(tag => `- ${tag}`).join('\n')}
 
 ${matchedSchool.notes}
 
-Requirements can change by program, residency status, and term, so use that official university page as the source of truth.`,
+Because requirements can change by program, residency status, and term, treat the university page as the source of truth. If you want, tell me another school name and I can check that one too.`,
       suggestions: ['Ask about another university', 'What vaccines do college students need?', 'Take me to sign up'],
     };
   }
@@ -155,7 +155,7 @@ Requirements can change by program, residency status, and term, so use that offi
   const route = ROUTE_RESPONSES.find(item => item.keywords.some(keyword => normalized.includes(keyword)));
   if (route) {
     return {
-      response: `I found the right page for this: **${route.label}**.\n\nI will only open it if you confirm.`,
+      response: `I found the page that matches what you asked for: **${route.label}**.\n\nI can take you there, but I will wait for your confirmation first so the page does not change unexpectedly.`,
       suggestions: ['Stay here', 'What is V-safe?', 'Show privacy information'],
       navigateTo: route.path,
       navigateLabel: route.label,
