@@ -181,6 +181,20 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
     scrollToBottom();
   }, [messages]);
 
+  useEffect(() => {
+    if (!isOpen || isCompact) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const previousOverscroll = document.body.style.overscrollBehavior;
+    document.body.style.overflow = 'hidden';
+    document.body.style.overscrollBehavior = 'none';
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.body.style.overscrollBehavior = previousOverscroll;
+    };
+  }, [isOpen, isCompact]);
+
   const handleSend = async (text: string = input) => {
     const messageContent = text || input;
     if (!messageContent.trim() || isLoading) return;
@@ -219,21 +233,25 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
 
   const getDefaultSuggestions = (msg: Message) => {
     if (msg.role !== 'assistant' || msg.action) return [];
-    return msg.suggestions || ['Take me to sign up', 'What vaccines do college students need?', 'Show participants page'];
+    return (msg.suggestions || ['Take me to sign up', 'What vaccines do college students need?']).slice(0, 2);
   };
 
   const handleConfirmNavigation = (message: Message) => {
     if (!message.action) return;
 
+    const openedLabel = message.action.label.replace('Open ', '');
     navigate(message.action.path);
     setMessages(prev => [
-      ...prev,
+      ...prev.map(item => item.id === message.id ? { ...item, action: undefined } : item),
       {
         id: `${Date.now()}-nav`,
         role: 'assistant',
-        content: `Done - I opened **${message.action.label.replace('Open ', '')}**. I will stay here if you need anything else.`,
+        content: `Done - I opened **${openedLabel}**. I will stay here if you need anything else.`,
       },
     ]);
+    window.setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 80);
   };
 
   return (
@@ -257,7 +275,7 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
               animate={isCompact ? { opacity: 1, y: 0, scale: 1 } : { x: 0 }}
               exit={isCompact ? { opacity: 0, y: 24, scale: 0.96 } : { x: '100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 260 }}
-              className={`fixed right-0 z-50 flex flex-col border-slate-200/80 bg-white shadow-2xl shadow-slate-950/15 pointer-events-auto ${
+              className={`fixed right-0 z-50 flex flex-col border-slate-200/80 bg-white shadow-2xl shadow-slate-950/15 pointer-events-auto overscroll-contain ${
                 isCompact
                   ? 'bottom-4 mx-4 h-[620px] max-h-[calc(100vh-2rem)] w-[calc(100vw-2rem)] max-w-[430px] overflow-hidden rounded-[1.75rem] border bg-white/95 shadow-[0_24px_70px_rgba(15,23,42,0.24)] backdrop-blur-2xl md:right-5 md:bottom-5 md:mx-0'
                   : 'top-0 bottom-0 w-full border-l md:w-[460px]'
@@ -309,7 +327,7 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
               </div>
 
               {/* Content Area */}
-              <div className="relative flex-1 overflow-y-auto bg-[linear-gradient(180deg,#f8fbff_0%,#f6f8fb_42%,#ffffff_100%)] px-5 py-5">
+              <div className="relative flex-1 overflow-y-auto overscroll-contain bg-[linear-gradient(180deg,#f8fbff_0%,#f6f8fb_42%,#ffffff_100%)] px-5 py-5">
                 <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-[radial-gradient(circle_at_50%_0%,rgba(52,147,214,0.10),transparent_65%)]" />
                 {messages.length === 0 ? (
                   <div className="relative space-y-5">
@@ -353,19 +371,6 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                         <ChevronRight className="h-4 w-4 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-health-blue" />
                       </button>
                       <button 
-                        onClick={() => handleSend("Report how I'm feeling today")}
-                        className="group flex w-full items-center gap-3 rounded-2xl border border-white/80 bg-white/82 px-4 py-3.5 text-left shadow-[0_10px_30px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/60 backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:ring-emerald-200 hover:shadow-[0_18px_42px_rgba(16,185,129,0.12)]"
-                      >
-                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-health-green ring-1 ring-emerald-100">
-                          <ShieldCheck className="h-5 w-5" />
-                        </span>
-                        <span className="min-w-0 flex-1">
-                          <span className="block text-sm font-black text-slate-950">Report how I feel</span>
-                          <span className="mt-0.5 block text-xs font-semibold text-slate-500">Start a short vaccine check-in.</span>
-                        </span>
-                        <ChevronRight className="h-4 w-4 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-health-green" />
-                      </button>
-                      <button 
                         onClick={() => handleSend("What vaccines do college students need?")}
                         className="group flex w-full items-center gap-3 rounded-2xl border border-white/80 bg-white/82 px-4 py-3.5 text-left shadow-[0_10px_30px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/60 backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:ring-violet-200 hover:shadow-[0_18px_42px_rgba(113,70,195,0.12)]"
                       >
@@ -377,19 +382,6 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                           <span className="mt-0.5 block text-xs font-semibold text-slate-500">Ask generally or name a school.</span>
                         </span>
                         <ChevronRight className="h-4 w-4 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-health-purple" />
-                      </button>
-                      <button 
-                        onClick={() => handleSend("Can you find UCLA vaccine requirements?")}
-                        className="group flex w-full items-center gap-3 rounded-2xl border border-white/80 bg-white/82 px-4 py-3.5 text-left shadow-[0_10px_30px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/60 backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:ring-slate-300 hover:shadow-[0_18px_42px_rgba(15,23,42,0.10)]"
-                      >
-                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-700 ring-1 ring-slate-200">
-                          <ExternalLink className="h-5 w-5" />
-                        </span>
-                        <span className="min-w-0 flex-1">
-                          <span className="block text-sm font-black text-slate-950">Find a university page</span>
-                          <span className="mt-0.5 block text-xs font-semibold text-slate-500">Example: UCLA, MIT, Harvard.</span>
-                        </span>
-                        <ChevronRight className="h-4 w-4 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-slate-700" />
                       </button>
                       <button 
                         onClick={() => handleSend("What is V-safe?")}
@@ -411,10 +403,11 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                     {messages.map((msg) => (
                       <div
                         key={msg.id}
-                        className={`flex items-end gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                        className={`flex items-start gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                       >
                         {msg.role === 'assistant' && (
-                          <div className="mb-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white text-health-blue shadow-sm ring-1 ring-slate-200">
+                          <div className="relative mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white text-health-blue shadow-sm ring-1 ring-slate-200">
+                            <span className="absolute left-0.5 h-4 w-0.5 rounded-full bg-health-green" />
                             <MessageSquare className="h-3.5 w-3.5" />
                           </div>
                         )}
