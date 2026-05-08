@@ -257,30 +257,33 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
               animate={isCompact ? { opacity: 1, y: 0, scale: 1 } : { x: 0 }}
               exit={isCompact ? { opacity: 0, y: 24, scale: 0.96 } : { x: '100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 260 }}
-              className={`fixed right-0 z-50 flex flex-col border-slate-200 bg-white shadow-2xl shadow-slate-950/15 pointer-events-auto ${
+              className={`fixed right-0 z-50 flex flex-col border-slate-200/80 bg-white shadow-2xl shadow-slate-950/15 pointer-events-auto ${
                 isCompact
-                  ? 'bottom-4 mx-4 h-[620px] max-h-[calc(100vh-2rem)] w-[calc(100vw-2rem)] max-w-[430px] overflow-hidden rounded-2xl border md:right-5 md:bottom-5 md:mx-0'
+                  ? 'bottom-4 mx-4 h-[620px] max-h-[calc(100vh-2rem)] w-[calc(100vw-2rem)] max-w-[430px] overflow-hidden rounded-[1.75rem] border bg-white/95 shadow-[0_24px_70px_rgba(15,23,42,0.24)] backdrop-blur-2xl md:right-5 md:bottom-5 md:mx-0'
                   : 'top-0 bottom-0 w-full border-l md:w-[430px]'
               }`}
             >
-              <div className={`border-b border-slate-200 bg-white ${isCompact ? 'px-4 py-3' : 'px-5 py-4'}`}>
-                <div className="flex items-start justify-between gap-4">
+              <div className={`relative overflow-hidden border-b border-slate-200/80 bg-white/90 backdrop-blur-2xl ${isCompact ? 'px-4 py-3' : 'px-5 py-5'}`}>
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_16%_0%,rgba(52,147,214,0.14),transparent_34%),radial-gradient(circle_at_90%_18%,rgba(113,70,195,0.10),transparent_30%),linear-gradient(180deg,rgba(248,250,252,0.98),rgba(255,255,255,0.82))]" />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-sky-200 to-transparent" />
+                <div className="relative flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <div className={`relative flex items-center justify-center rounded-full border border-health-blue/70 bg-blue-50 text-health-blue shadow-sm shadow-blue-100 ${isCompact ? 'h-10 w-10' : 'h-12 w-12'}`}>
-                      <span className={`absolute left-1 rounded-full bg-health-green ${isCompact ? 'h-6 w-1' : 'h-7 w-1'}`} />
-                      <MessageSquare className={isCompact ? 'h-4 w-4' : 'h-5 w-5'} />
-                      <Sparkles className="absolute -right-1 -top-1 h-4 w-4 text-health-purple" />
+                    <div className={`relative isolate flex shrink-0 items-center justify-center rounded-[1.25rem] border border-white/80 bg-white text-health-blue shadow-[inset_0_0_0_1px_rgba(52,147,214,0.16),0_14px_34px_rgba(52,147,214,0.18)] ${isCompact ? 'h-11 w-11' : 'h-14 w-14'}`}>
+                      <span className="absolute inset-0 -z-10 rounded-[1.25rem] bg-[linear-gradient(135deg,rgba(52,147,214,0.14),rgba(255,255,255,0.7)_45%,rgba(113,70,195,0.12))]" />
+                      <span className={`absolute left-1.5 rounded-full bg-gradient-to-b from-health-green to-sky-400 shadow-sm ${isCompact ? 'h-6 w-1' : 'h-8 w-1.5'}`} />
+                      <MessageSquare className={isCompact ? 'h-5 w-5' : 'h-6 w-6'} strokeWidth={2.1} />
+                      <Sparkles className="absolute -right-1.5 -top-1.5 h-4 w-4 text-violet-500 drop-shadow-sm" />
                     </div>
-                    <div>
-                      <p className="text-[11px] font-black uppercase tracking-[0.22em] text-slate-400">V-safe AI demo</p>
-                      <h2 className={`${isCompact ? 'text-lg' : 'text-xl'} font-black tracking-tight text-health-navy`}>Ask V-safe AI</h2>
-                      <p className="mt-0.5 text-xs font-semibold text-slate-500">Navigation, check-in support, and campus vaccine links</p>
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">V-safe AI demo</p>
+                      <h2 className={`${isCompact ? 'text-lg' : 'text-2xl'} font-black tracking-tight text-slate-950`}>Ask V-safe AI</h2>
+                      <p className="mt-0.5 max-w-[280px] text-xs font-semibold leading-5 text-slate-500">Navigation, check-in support, and campus vaccine links</p>
                     </div>
                   </div>
                   <div className="flex shrink-0 items-center gap-1">
                     <button
                       onClick={() => setIsCompact(value => !value)}
-                      className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-blue-50 hover:text-health-blue"
+                      className="rounded-full border border-transparent p-2 text-slate-400 transition-all hover:border-slate-200 hover:bg-white/80 hover:text-health-blue hover:shadow-sm"
                       aria-label={isCompact ? 'Expand assistant' : 'Use compact assistant window'}
                       title={isCompact ? 'Expand assistant' : 'Small window mode'}
                     >
@@ -288,16 +291,20 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                     </button>
                     <button 
                       onClick={() => setIsOpen(false)}
-                      className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+                      className="rounded-full border border-transparent p-2 text-slate-400 transition-all hover:border-slate-200 hover:bg-white/80 hover:text-slate-700 hover:shadow-sm"
                       aria-label="Close assistant"
                     >
                       <X className="h-5 w-5" />
                     </button>
                   </div>
                 </div>
-                <div className={`${isCompact ? 'mt-3' : 'mt-4'} flex items-center gap-2 rounded-lg border border-health-blue/15 bg-health-blue/5 px-3 py-2 text-xs font-semibold text-health-navy`}>
-                  <ShieldCheck className="h-4 w-4 text-health-green" />
-                  Routes pages, explains V-safe, and surfaces university vaccine links
+                <div className={`relative ${isCompact ? 'mt-3' : 'mt-5'} rounded-2xl border border-white/80 bg-white/70 p-1 shadow-[inset_0_0_0_1px_rgba(148,163,184,0.12),0_10px_24px_rgba(15,23,42,0.05)]`}>
+                  <div className="flex items-center gap-2.5 rounded-[0.85rem] bg-slate-50/80 px-3 py-2 text-xs font-semibold leading-5 text-slate-700">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-health-green ring-1 ring-emerald-100">
+                      <ShieldCheck className="h-4 w-4" />
+                    </span>
+                    <span>Guides pages, explains V-safe, and finds campus vaccine links</span>
+                  </div>
                 </div>
               </div>
 
