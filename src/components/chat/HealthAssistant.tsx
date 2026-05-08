@@ -247,7 +247,7 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={() => setIsOpen(false)}
-                className="fixed inset-0 bg-slate-950/10 z-50 pointer-events-auto"
+                className="fixed inset-0 z-50 bg-slate-950/20 backdrop-blur-[2px] pointer-events-auto"
               />
             )}
             
@@ -260,7 +260,7 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
               className={`fixed right-0 z-50 flex flex-col border-slate-200/80 bg-white shadow-2xl shadow-slate-950/15 pointer-events-auto ${
                 isCompact
                   ? 'bottom-4 mx-4 h-[620px] max-h-[calc(100vh-2rem)] w-[calc(100vw-2rem)] max-w-[430px] overflow-hidden rounded-[1.75rem] border bg-white/95 shadow-[0_24px_70px_rgba(15,23,42,0.24)] backdrop-blur-2xl md:right-5 md:bottom-5 md:mx-0'
-                  : 'top-0 bottom-0 w-full border-l md:w-[430px]'
+                  : 'top-0 bottom-0 w-full border-l md:w-[460px]'
               }`}
             >
               <div className={`relative overflow-hidden border-b border-slate-200/80 bg-white/90 backdrop-blur-2xl ${isCompact ? 'px-4 py-3' : 'px-5 py-5'}`}>
@@ -309,69 +309,120 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
               </div>
 
               {/* Content Area */}
-              <div className="flex-1 overflow-y-auto bg-slate-50/70 px-5 py-5">
+              <div className="relative flex-1 overflow-y-auto bg-[linear-gradient(180deg,#f8fbff_0%,#f6f8fb_42%,#ffffff_100%)] px-5 py-5">
+                <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-[radial-gradient(circle_at_50%_0%,rgba(52,147,214,0.10),transparent_65%)]" />
                 {messages.length === 0 ? (
-                  <div className="space-y-5">
-                    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                      <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-health-green/10 text-health-green">
-                        <Sparkles className="h-5 w-5" />
+                  <div className="relative space-y-5">
+                    <div className="overflow-hidden rounded-[1.4rem] border border-white/80 bg-white/85 p-5 shadow-[0_18px_46px_rgba(15,23,42,0.08)] ring-1 ring-slate-200/60 backdrop-blur-xl">
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50/80 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.12em] text-emerald-700">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_0_4px_rgba(16,185,129,0.12)]" />
+                            Ready to guide
+                          </div>
+                          <h3 className="text-2xl font-black tracking-tight text-slate-950">How can I help today?</h3>
+                        </div>
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-slate-950 text-white shadow-[0_16px_32px_rgba(15,23,42,0.18)]">
+                          <Sparkles className="h-5 w-5" />
+                        </div>
                       </div>
-                      <h3 className="text-2xl font-black tracking-tight text-health-navy">Hello, Jamie</h3>
-                      <p className="mt-2 text-sm leading-6 text-slate-600">
-                        I can help you navigate the demo, explain V-safe, or find vaccine requirement resources for students.
+                      <p className="mt-3 text-sm leading-6 text-slate-600">
+                        Ask naturally. I can route you to the right page, explain V-safe in plain language, or find a university vaccine requirement link.
                       </p>
+                      <div className="mt-5 grid grid-cols-3 gap-2 text-center">
+                        {['Navigation', 'V-safe info', 'Campus links'].map(item => (
+                          <div key={item} className="rounded-2xl border border-slate-200/70 bg-slate-50/70 px-2 py-2 text-[11px] font-black text-slate-500">
+                            {item}
+                          </div>
+                        ))}
+                      </div>
                     </div>
 
                     <div className="space-y-2.5">
                       <button 
                         onClick={() => handleSend("Take me to the sign up page")}
-                        className="group flex w-full items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-bold text-health-navy shadow-sm transition hover:border-health-blue/40 hover:bg-blue-50/40"
+                        className="group flex w-full items-center gap-3 rounded-2xl border border-white/80 bg-white/82 px-4 py-3.5 text-left shadow-[0_10px_30px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/60 backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:ring-sky-200 hover:shadow-[0_18px_42px_rgba(52,147,214,0.14)]"
                       >
-                        <span>Take me to sign up</span>
-                        <MapPinned className="w-4 h-4 text-health-purple group-hover:translate-x-1 transition-transform" />
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-sky-50 text-health-blue ring-1 ring-sky-100">
+                          <MapPinned className="h-5 w-5" />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-sm font-black text-slate-950">Take me to sign up</span>
+                          <span className="mt-0.5 block text-xs font-semibold text-slate-500">I will ask before opening the page.</span>
+                        </span>
+                        <ChevronRight className="h-4 w-4 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-health-blue" />
                       </button>
                       <button 
                         onClick={() => handleSend("Report how I'm feeling today")}
-                        className="group flex w-full items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-bold text-health-navy shadow-sm transition hover:border-health-blue/40 hover:bg-blue-50/40"
+                        className="group flex w-full items-center gap-3 rounded-2xl border border-white/80 bg-white/82 px-4 py-3.5 text-left shadow-[0_10px_30px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/60 backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:ring-emerald-200 hover:shadow-[0_18px_42px_rgba(16,185,129,0.12)]"
                       >
-                        <span>Report how I'm feeling today</span>
-                        <ChevronRight className="w-4 h-4 text-health-purple group-hover:translate-x-1 transition-transform" />
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-health-green ring-1 ring-emerald-100">
+                          <ShieldCheck className="h-5 w-5" />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-sm font-black text-slate-950">Report how I feel</span>
+                          <span className="mt-0.5 block text-xs font-semibold text-slate-500">Start a short vaccine check-in.</span>
+                        </span>
+                        <ChevronRight className="h-4 w-4 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-health-green" />
                       </button>
                       <button 
                         onClick={() => handleSend("What vaccines do college students need?")}
-                        className="group flex w-full items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-bold text-health-navy shadow-sm transition hover:border-health-blue/40 hover:bg-blue-50/40"
+                        className="group flex w-full items-center gap-3 rounded-2xl border border-white/80 bg-white/82 px-4 py-3.5 text-left shadow-[0_10px_30px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/60 backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:ring-violet-200 hover:shadow-[0_18px_42px_rgba(113,70,195,0.12)]"
                       >
-                        <span>College vaccine requirements</span>
-                        <ExternalLink className="w-4 h-4 text-health-purple group-hover:translate-x-1 transition-transform" />
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-violet-50 text-health-purple ring-1 ring-violet-100">
+                          <ExternalLink className="h-5 w-5" />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-sm font-black text-slate-950">College vaccine requirements</span>
+                          <span className="mt-0.5 block text-xs font-semibold text-slate-500">Ask generally or name a school.</span>
+                        </span>
+                        <ChevronRight className="h-4 w-4 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-health-purple" />
                       </button>
                       <button 
                         onClick={() => handleSend("Can you find UCLA vaccine requirements?")}
-                        className="group flex w-full items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-bold text-health-navy shadow-sm transition hover:border-health-blue/40 hover:bg-blue-50/40"
+                        className="group flex w-full items-center gap-3 rounded-2xl border border-white/80 bg-white/82 px-4 py-3.5 text-left shadow-[0_10px_30px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/60 backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:ring-slate-300 hover:shadow-[0_18px_42px_rgba(15,23,42,0.10)]"
                       >
-                        <span>Ask about a specific university</span>
-                        <ExternalLink className="w-4 h-4 text-health-purple group-hover:translate-x-1 transition-transform" />
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-700 ring-1 ring-slate-200">
+                          <ExternalLink className="h-5 w-5" />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-sm font-black text-slate-950">Find a university page</span>
+                          <span className="mt-0.5 block text-xs font-semibold text-slate-500">Example: UCLA, MIT, Harvard.</span>
+                        </span>
+                        <ChevronRight className="h-4 w-4 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-slate-700" />
                       </button>
                       <button 
                         onClick={() => handleSend("What is V-safe?")}
-                        className="group flex w-full items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-bold text-health-navy shadow-sm transition hover:border-health-blue/40 hover:bg-blue-50/40"
+                        className="group flex w-full items-center gap-3 rounded-2xl border border-white/80 bg-white/82 px-4 py-3.5 text-left shadow-[0_10px_30px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/60 backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:ring-sky-200 hover:shadow-[0_18px_42px_rgba(52,147,214,0.14)]"
                       >
-                        <span>What is V-safe?</span>
-                        <ChevronRight className="w-4 h-4 text-health-purple group-hover:translate-x-1 transition-transform" />
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-sky-50 text-health-blue ring-1 ring-sky-100">
+                          <MessageSquare className="h-5 w-5" />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-sm font-black text-slate-950">What is V-safe?</span>
+                          <span className="mt-0.5 block text-xs font-semibold text-slate-500">Get a clear, human explanation.</span>
+                        </span>
+                        <ChevronRight className="h-4 w-4 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-health-blue" />
                       </button>
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-4 pb-4">
+                  <div className="relative space-y-4 pb-4">
                     {messages.map((msg) => (
                       <div
                         key={msg.id}
-                        className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                        className={`flex items-end gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                       >
+                        {msg.role === 'assistant' && (
+                          <div className="mb-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white text-health-blue shadow-sm ring-1 ring-slate-200">
+                            <MessageSquare className="h-3.5 w-3.5" />
+                          </div>
+                        )}
                         <div
-                          className={`max-w-[86%] overflow-hidden text-sm leading-6 shadow-sm ${
+                          className={`max-w-[88%] overflow-hidden text-sm leading-6 ${
                             msg.role === 'user'
-                              ? 'rounded-2xl rounded-tr-md bg-health-blue px-4 py-3 text-white'
-                              : 'rounded-2xl rounded-tl-md border border-slate-200 bg-white text-slate-800'
+                              ? 'rounded-[1.35rem] rounded-br-md bg-[linear-gradient(135deg,#1f9be2,#3478d6)] px-4 py-3 text-white shadow-[0_14px_32px_rgba(52,147,214,0.22)]'
+                              : 'rounded-[1.35rem] rounded-bl-md border border-white/80 bg-white/90 text-slate-800 shadow-[0_14px_34px_rgba(15,23,42,0.07)] ring-1 ring-slate-200/60 backdrop-blur-xl'
                           }`}
                         >
                           <div className={`markdown-body leading-6 ${msg.role === 'assistant' ? 'px-4 py-3' : ''}`}>
@@ -388,14 +439,14 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                             </ReactMarkdown>
                           </div>
                           {msg.role === 'assistant' && msg.action && (
-                            <div className="border-t border-slate-200 bg-slate-50 px-3 py-3">
-                              <div className="mb-2 text-[11px] font-black uppercase tracking-[0.16em] text-slate-400">
+                            <div className="border-t border-slate-200/80 bg-slate-50/80 px-3 py-3">
+                              <div className="mb-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
                                 Permission required
                               </div>
                               <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto]">
                                 <button
                                   onClick={() => handleConfirmNavigation(msg)}
-                                  className="inline-flex items-center justify-center gap-2 rounded bg-health-blue px-3 py-2.5 text-xs font-black text-white transition hover:bg-blue-600"
+                                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950 px-3 py-2.5 text-xs font-black text-white shadow-[0_10px_22px_rgba(15,23,42,0.18)] transition hover:-translate-y-0.5 hover:bg-slate-800"
                                 >
                                   {msg.action.label}
                                   <ChevronRight className="h-3.5 w-3.5" />
@@ -411,7 +462,7 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                                       },
                                     ])
                                   }
-                                  className="inline-flex items-center justify-center rounded border border-slate-300 bg-white px-3 py-2.5 text-xs font-black text-slate-600 transition hover:bg-slate-50"
+                                  className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-black text-slate-600 transition hover:bg-slate-50 hover:text-slate-900"
                                 >
                                   Stay here
                                 </button>
@@ -419,8 +470,8 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                             </div>
                           )}
                           {msg.role === 'assistant' && !msg.action && getDefaultSuggestions(msg).length > 0 && (
-                            <div className="border-t border-slate-200 bg-slate-50 px-3 py-3">
-                              <div className="mb-2 text-[11px] font-black uppercase tracking-[0.16em] text-slate-400">
+                            <div className="border-t border-slate-200/80 bg-slate-50/80 px-3 py-3">
+                              <div className="mb-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
                                 You can ask next
                               </div>
                               <div className="flex flex-wrap gap-2">
@@ -428,7 +479,7 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                                   <button
                                     key={suggestion}
                                     onClick={() => handleSend(suggestion)}
-                                    className="rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-black text-slate-600 transition hover:border-health-blue/40 hover:bg-blue-50"
+                                    className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-black text-slate-600 shadow-sm transition hover:-translate-y-0.5 hover:border-sky-200 hover:bg-sky-50 hover:text-slate-900"
                                   >
                                     {suggestion}
                                   </button>
@@ -441,9 +492,9 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                     ))}
                     {isLoading && (
                       <div className="flex justify-start">
-                        <div className="flex items-center gap-3 rounded-2xl rounded-tl-md border border-slate-200 bg-white px-4 py-3 shadow-sm">
+                        <div className="flex items-center gap-3 rounded-[1.35rem] rounded-bl-md border border-white/80 bg-white/90 px-4 py-3 shadow-[0_14px_34px_rgba(15,23,42,0.07)] ring-1 ring-slate-200/60 backdrop-blur-xl">
                           <Loader2 className="w-4 h-4 text-health-blue animate-spin" />
-                          <span className="text-sm text-slate-500 font-bold">V-safe AI is thinking...</span>
+                          <span className="text-sm text-slate-500 font-bold">Thinking through the next best step...</span>
                         </div>
                       </div>
                     )}
@@ -453,9 +504,9 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
               </div>
 
               {/* Input Area */}
-              <div className="border-t border-slate-200 bg-white px-5 py-4">
+              <div className="border-t border-slate-200/80 bg-white/90 px-5 py-4 backdrop-blur-xl">
                 <div className="relative flex items-end gap-3">
-                  <div className="flex-1 overflow-hidden rounded-xl border border-slate-200 bg-slate-50 transition-all focus-within:border-health-blue focus-within:ring-4 focus-within:ring-health-blue/10">
+                  <div className="flex-1 overflow-hidden rounded-[1.35rem] border border-slate-200/80 bg-slate-50/80 shadow-inner transition-all focus-within:border-sky-300 focus-within:bg-white focus-within:ring-4 focus-within:ring-sky-200/40">
                     <textarea
                       rows={2}
                       value={input}
@@ -467,22 +518,24 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                         }
                       }}
                       placeholder="Type your message..."
-                      className="block w-full resize-none border-none bg-transparent px-4 py-3 text-sm text-slate-700 outline-none placeholder:text-slate-400"
+                      className="block w-full resize-none border-none bg-transparent px-4 py-3 text-sm font-medium text-slate-800 outline-none placeholder:text-slate-400"
                     />
                   </div>
                   <button
                     onClick={() => handleSend()}
                     disabled={!input.trim() || isLoading}
-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-health-blue text-white transition-all hover:bg-blue-600 active:scale-95 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
+                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[1.1rem] bg-slate-950 text-white shadow-[0_14px_30px_rgba(15,23,42,0.22)] transition-all hover:-translate-y-0.5 hover:bg-slate-800 active:scale-95 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none"
                     aria-label="Send message"
                   >
                     <Send className="w-5 h-5" />
                   </button>
                 </div>
                 
-                <p className="mt-3 text-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-300">
+                <div className="mt-3 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-slate-300">
+                  <span className="h-px w-8 bg-slate-200" />
                   Demo only - Not medical advice
-                </p>
+                  <span className="h-px w-8 bg-slate-200" />
+                </div>
               </div>
             </motion.div>
           </>
