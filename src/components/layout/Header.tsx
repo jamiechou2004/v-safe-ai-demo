@@ -56,13 +56,12 @@ export default function Header({ isChatOpen, onToggleChat, onOpenAuth }: HeaderP
               </button>
               <button
                 onClick={onToggleChat}
-                className="group relative isolate overflow-hidden rounded-full border border-slate-200/80 bg-white/85 px-3 py-2 text-xs font-black text-slate-900 shadow-[0_10px_28px_rgba(15,23,42,0.08)] backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:border-sky-300/80 hover:bg-white hover:shadow-[0_18px_45px_rgba(52,147,214,0.18)] focus:outline-none focus:ring-4 focus:ring-sky-400/15 active:translate-y-0 active:scale-[0.98] lg:px-4 lg:py-2.5 lg:text-sm"
+                className="group relative isolate overflow-hidden rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-900 shadow-[0_8px_22px_rgba(15,23,42,0.07)] transition-all duration-200 hover:-translate-y-0.5 hover:border-sky-200 hover:shadow-[0_14px_34px_rgba(52,147,214,0.13)] focus:outline-none focus:ring-4 focus:ring-sky-400/15 active:translate-y-0 active:scale-[0.98] lg:px-4 lg:py-2.5 lg:text-sm"
                 aria-pressed={isChatOpen}
               >
-                <span className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_18%_18%,rgba(255,255,255,0.95),transparent_32%),linear-gradient(135deg,rgba(52,147,214,0.12),rgba(113,70,195,0.08)_55%,rgba(85,167,81,0.10))] opacity-90 transition-opacity duration-300 group-hover:opacity-100" />
-                <span className="absolute inset-y-1 left-1 w-1 rounded-full bg-gradient-to-b from-emerald-400 to-sky-400 transition-all duration-200 group-hover:inset-y-2" />
-                <span className="relative flex items-center gap-2.5 pl-2">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-health-blue shadow-[inset_0_0_0_1px_rgba(52,147,214,0.18),0_6px_16px_rgba(52,147,214,0.16)] transition-transform duration-200 group-hover:scale-105">
+                <span className="absolute inset-0 -z-10 bg-[linear-gradient(135deg,rgba(52,147,214,0.08),rgba(248,250,252,0.9)_50%,rgba(113,70,195,0.06))] opacity-80 transition-opacity duration-200 group-hover:opacity-100" />
+                <span className="relative flex items-center gap-2.5">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-health-blue shadow-[inset_0_0_0_1px_rgba(52,147,214,0.16),0_5px_14px_rgba(52,147,214,0.12)] transition-transform duration-200 group-hover:scale-105">
                     <MessageSquare className="h-4 w-4" />
                   </span>
                   Ask V-safe AI
