@@ -117,7 +117,100 @@ export const universities: UniversityRecord[] = [
   { name: 'Montana State University', aliases: ['montana state', 'msu bozeman'], immunizationUrl: 'https://www.montana.edu/health/immunizations/', commonRequirementTags: commonTags, notes: 'Montana State Student Health Services provides immunization information.' },
 ] as const;
 
+const vaccineContextTerms = [
+  'vaccine',
+  'vaccines',
+  'vaccination',
+  'immunization',
+  'immunisation',
+  'requirement',
+  'requirements',
+  'required',
+  'student health',
+  'health requirement',
+  'health requirements',
+  'medical requirement',
+  'medical requirements',
+  'health form',
+  'health forms',
+  'meningitis',
+  'meningococcal',
+  'shot',
+  'shots',
+  'mmr',
+  'tdap',
+  'hepatitis',
+  'varicella',
+  '疫苗',
+  '免疫',
+  '接种',
+  '要求',
+];
+
+const educationContextTerms = [
+  'university',
+  'college',
+  'school',
+  'campus',
+  'student',
+  'freshman',
+  'incoming',
+  '大学',
+  '学校',
+  '学生',
+];
+
+function normalizeText(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9\u4e00-\u9fff]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function hasPhrase(normalizedQuery: string, normalizedPhrase: string) {
+  if (!normalizedPhrase) return false;
+  return ` ${normalizedQuery} `.includes(` ${normalizedPhrase} `);
+}
+
+function hasAnyContext(normalizedQuery: string, terms: string[]) {
+  return terms.some(term => hasPhrase(normalizedQuery, normalizeText(term)));
+}
+
+function getUniversityScore(school: UniversityRecord, normalizedQuery: string) {
+  const hasVaccineContext = hasAnyContext(normalizedQuery, vaccineContextTerms);
+  const hasEducationContext = hasAnyContext(normalizedQuery, educationContextTerms);
+  const allNames = [school.name, ...school.aliases];
+
+  return allNames.reduce((bestScore, name) => {
+    const normalizedName = normalizeText(name);
+    if (!hasPhrase(normalizedQuery, normalizedName)) return bestScore;
+
+    const isShortAlias = normalizedName.length <= 3;
+    if (isShortAlias && !hasVaccineContext && !hasEducationContext) return bestScore;
+
+    const score =
+      normalizedName === normalizeText(school.name) ? 100 :
+      isShortAlias ? 72 :
+      normalizedName.split(' ').length > 1 ? 90 :
+      82;
+
+    return Math.max(bestScore, score);
+  }, 0);
+}
+
+export function hasSchoolVaccineIntent(query: string) {
+  const normalized = normalizeText(query);
+  return hasAnyContext(normalized, vaccineContextTerms) && hasAnyContext(normalized, educationContextTerms);
+}
+
 export function findUniversityByQuery(query: string) {
-  const normalized = query.toLowerCase();
-  return universities.find(school => school.aliases.some(alias => normalized.includes(alias)));
+  const normalized = normalizeText(query);
+  const ranked = universities
+    .map(school => ({ school, score: getUniversityScore(school, normalized) }))
+    .filter(match => match.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  return ranked[0]?.school;
 }

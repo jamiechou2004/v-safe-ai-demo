@@ -1,3 +1,5 @@
+import { findUniversityByQuery, hasSchoolVaccineIntent } from '../data/universities';
+
 const fallbackResponses = [
   `I can help with that. This demo is built around the moments where people usually need a little direction: finding the right page, understanding V-safe, or checking vaccine requirement resources for school.
 
@@ -20,6 +22,26 @@ You can ask about check-ins, V-safe basics, privacy, emergency guidance, or a un
 
 function chooseDemoResponse(message: string) {
   const normalized = message.toLowerCase();
+  const matchedSchool = findUniversityByQuery(message);
+
+  if (matchedSchool) {
+    return `**${matchedSchool.name}: start with the official student immunization page.**
+
+[${matchedSchool.name} immunization requirements](${matchedSchool.immunizationUrl})
+
+Common areas to review:
+${matchedSchool.commonRequirementTags.map(tag => `- ${tag}`).join('\n')}
+
+${matchedSchool.notes}
+
+Use that official page as the source of truth because requirements can change by program, term, and student status.`;
+  }
+
+  if (hasSchoolVaccineIntent(message)) {
+    return `I understand this is about school vaccine requirements, but I could not match a specific university in the demo database.
+
+Send the school name directly, such as "UCLA", "MIT", or "University of Michigan", and I will look for the official immunization page first.`;
+  }
 
   if (normalized.includes('symptom') || normalized.includes('fever') || normalized.includes('headache') || normalized.includes('sore')) {
     return `I am sorry you are dealing with symptoms. I can help you decide what to do in the demo and when to look for urgent help.

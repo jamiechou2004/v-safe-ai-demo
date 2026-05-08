@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
 import { useNavigate } from 'react-router-dom';
 import { getHealthAssistantResponse } from '../../services/geminiService';
-import { findUniversityByQuery } from '../../data/universities';
+import { findUniversityByQuery, hasSchoolVaccineIntent } from '../../data/universities';
 
 interface Message {
   id: string;
@@ -43,7 +43,7 @@ Small note: I can help explain and guide you through the demo, but I cannot repl
 
 const COLLEGE_VACCINE_INFO = `Yes, I can help with that. College vaccine requirements can feel hard to track because each school may set its own rules, forms, deadlines, and exemptions.
 
-The best next step is to tell me the university name. If it is in this demo database, I will give you that school's official immunization page and summarize what kind of requirements to look for.
+Tell me the university name, and I will check this demo database for the school's official immunization page first. If the school is not in the demo database, I will say that clearly instead of guessing.
 
 For general U.S. vaccine guidance, these CDC pages are useful starting points:
 
@@ -106,19 +106,34 @@ function getAssistantIntent(message: string): AssistantIntent | null {
 
   if (matchedSchool) {
     return {
-      response: `I found a school-specific resource for you.
+      response: `**${matchedSchool.name}: use the official student immunization page.**
 
-For **${matchedSchool.name}**, this is the official page to start with for student immunization or vaccine requirements:
+Source:
 
 [${matchedSchool.name} immunization requirements](${matchedSchool.immunizationUrl})
 
-What to look for on that page:
+Common requirement areas to review:
 ${matchedSchool.commonRequirementTags.map(tag => `- ${tag}`).join('\n')}
 
+Why this is the right source:
 ${matchedSchool.notes}
 
-Because requirements can change by program, residency status, and term, treat the university page as the source of truth. If you want, tell me another school name and I can check that one too.`,
-      suggestions: ['Ask about another university', 'What vaccines do college students need?', 'Take me to sign up'],
+Requirements can change by program, residency status, deadline, and term. Use the official page above as the source of truth, then check upload instructions and exemption rules if they apply to you.`,
+      suggestions: ['Ask another school', 'What vaccines do college students need?'],
+    };
+  }
+
+  if (hasSchoolVaccineIntent(message)) {
+    return {
+      response: `I can help with school vaccine requirements, but I did not find a specific university match in this demo database.
+
+Please send the school name exactly as it appears, for example:
+- UCLA
+- MIT
+- University of Michigan
+
+I will look for that school's official immunization page first and avoid guessing if it is not in the demo data.`,
+      suggestions: ['Ask about UCLA', 'Ask about University of Michigan'],
     };
   }
 
@@ -127,13 +142,16 @@ Because requirements can change by program, residency status, and term, treat th
     normalized.includes('university') ||
     normalized.includes('student vaccine') ||
     normalized.includes('school vaccine') ||
+    normalized.includes('immunization requirement') ||
+    normalized.includes('vaccine requirement') ||
+    normalized.includes('campus vaccine') ||
     normalized.includes('大学') ||
     normalized.includes('学生') ||
     normalized.includes('学校疫苗')
   ) {
     return {
       response: COLLEGE_VACCINE_INFO,
-      suggestions: ['Ask about UCLA requirements', 'Ask about MIT requirements', 'Ask about Harvard requirements'],
+      suggestions: ['Ask about UCLA requirements', 'Ask about MIT requirements'],
     };
   }
 
