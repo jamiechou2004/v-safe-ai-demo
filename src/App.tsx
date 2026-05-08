@@ -28,7 +28,7 @@ export default function App() {
         />
         <main className="flex-grow">
           <Routes>
-            <Route path="/" element={<Home onOpenAuth={setAuthMode} />} />
+            <Route path="/" element={<Home onOpenAuth={setAuthMode} onOpenAssistant={() => setIsChatOpen(true)} />} />
             <Route path="/check-in" element={<CheckIn />} />
             <Route path="/emergency" element={<Emergency />} />
             <Route path="/privacy" element={<Privacy />} />

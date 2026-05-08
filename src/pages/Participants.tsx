@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Calendar, Database, Link as LinkIcon, Send, Upload, UsersRound } from 'lucide-react';
+import { Calendar, Database, ExternalLink, Link as LinkIcon, Send, Upload, UsersRound } from 'lucide-react';
 import { universities } from '../data/universities';
 
 interface Participant {
@@ -36,6 +36,7 @@ export default function Participants() {
   const [phone, setPhone] = useState('+15551234567');
   const [university, setUniversity] = useState('UCLA');
   const [vaccinationDate, setVaccinationDate] = useState('');
+  const selectedUniversity = universities.find(school => school.name === university);
 
   const enrollParticipant = () => {
     if (!phone.trim() || !vaccinationDate) return;
@@ -62,18 +63,39 @@ export default function Participants() {
   };
 
   return (
-    <div className="bg-slate-100 px-4 py-8 sm:px-6 lg:px-8">
+    <div className="bg-[linear-gradient(180deg,#f8fbff_0%,#eef4f9_48%,#f8fafc_100%)] px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
-        <div className="mb-7 flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-cyan-50 text-health-navy">
-            <UsersRound className="h-7 w-7" />
+        <div className="mb-7 overflow-hidden rounded-[2rem] border border-white/80 bg-white/88 p-7 shadow-[0_18px_56px_rgba(15,23,42,0.08)] ring-1 ring-slate-200/70">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div className="flex items-start gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-cyan-50 text-health-navy ring-1 ring-cyan-100">
+                <UsersRound className="h-7 w-7" />
+              </div>
+              <div>
+                <p className="text-sm font-black uppercase tracking-[0.16em] text-health-blue">Participant operations</p>
+                <h1 className="mt-2 text-3xl font-black tracking-tight text-health-navy">Participants</h1>
+                <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-slate-500">
+                  Enroll people, attach university context, and send check-in reminders from one clear workspace.
+                </p>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-2 rounded-2xl bg-slate-50 p-2 ring-1 ring-slate-200/70">
+              {[
+                { label: 'Total', value: participants.length },
+                { label: 'Ready', value: participants.filter(item => item.status === 'Ready').length },
+                { label: 'Schools', value: universities.length },
+              ].map(item => (
+                <div key={item.label} className="rounded-xl bg-white px-4 py-2 text-center shadow-sm">
+                  <div className="text-lg font-black text-slate-950">{item.value}</div>
+                  <div className="text-[10px] font-black uppercase tracking-[0.12em] text-slate-400">{item.label}</div>
+                </div>
+              ))}
+            </div>
           </div>
-          <h1 className="text-3xl font-black tracking-tight text-health-navy">Participants</h1>
-          <div className="h-px flex-1 bg-slate-300" />
         </div>
 
         <div className="grid gap-8 xl:grid-cols-[380px_1fr]">
-          <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+          <section className="overflow-hidden rounded-[1.5rem] border border-white/80 bg-white/88 shadow-[0_16px_44px_rgba(15,23,42,0.07)] ring-1 ring-slate-200/70">
             <div className="border-b border-slate-200 px-7 py-8">
               <h2 className="text-2xl font-black text-health-navy">Enroll participant</h2>
             </div>
@@ -116,6 +138,17 @@ export default function Participants() {
                 <p className="text-xs font-semibold leading-5 text-slate-500">
                   Demo database: {universities.length} universities with saved vaccine requirement links.
                 </p>
+                {selectedUniversity && (
+                  <a
+                    href={selectedUniversity.immunizationUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 flex items-center justify-between gap-3 rounded-2xl border border-sky-100 bg-sky-50/70 px-4 py-3 text-sm font-bold text-health-blue transition hover:bg-sky-50"
+                  >
+                    View {selectedUniversity.name} immunization page
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -161,9 +194,17 @@ export default function Participants() {
             </div>
           </section>
 
-          <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+          <section className="overflow-hidden rounded-[1.5rem] border border-white/80 bg-white/88 shadow-[0_16px_44px_rgba(15,23,42,0.07)] ring-1 ring-slate-200/70">
             <div className="border-b border-slate-200 px-7 py-8">
-              <h2 className="text-2xl font-black text-health-navy">Roster</h2>
+              <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+                <div>
+                  <h2 className="text-2xl font-black text-health-navy">Roster</h2>
+                  <p className="mt-1 text-sm font-semibold text-slate-500">Reminder status stays visible so the next action is obvious.</p>
+                </div>
+                <div className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-black uppercase tracking-[0.12em] text-emerald-700">
+                  {participants.filter(item => item.status === 'Sent').length} sent
+                </div>
+              </div>
             </div>
 
             <div className="overflow-x-auto">

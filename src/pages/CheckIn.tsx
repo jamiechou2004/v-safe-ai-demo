@@ -37,20 +37,69 @@ export default function CheckIn() {
   const toggleSymptom = (s: string) => {
     setFormData(prev => ({
       ...prev,
-      symptoms: prev.symptoms.includes(s) 
-        ? prev.symptoms.filter(item => item !== s)
-        : [...prev.symptoms, s]
+      symptoms: s === 'None'
+        ? prev.symptoms.includes('None') ? [] : ['None']
+        : prev.symptoms.includes(s)
+          ? prev.symptoms.filter(item => item !== s)
+          : [...prev.symptoms.filter(item => item !== 'None'), s]
     }));
   };
 
   const currentStepIndex = steps.findIndex(s => s.key === step);
+  const stepMeta: Record<Exclude<Step, 'confirmation'>, { eyebrow: string; title: string; helper: string; next: string }> = {
+    vaccine: {
+      eyebrow: 'Start with the basics',
+      title: 'Tell us about your vaccination',
+      helper: 'Use the information from your vaccine card. Required fields are kept to the minimum needed for this demo.',
+      next: 'Continue to location',
+    },
+    location: {
+      eyebrow: 'Add context',
+      title: 'Where was the shot given?',
+      helper: 'A clinic, pharmacy, or city is enough for this prototype. This helps the flow feel realistic without asking for too much.',
+      next: 'Continue to symptoms',
+    },
+    symptoms: {
+      eyebrow: 'Check how you feel',
+      title: 'How are you feeling?',
+      helper: 'Choose "None" if you feel fine. Selecting a symptom will automatically clear "None."',
+      next: 'Continue to details',
+    },
+    severity: {
+      eyebrow: 'Final detail',
+      title: 'Just a few more details',
+      helper: 'This last step helps make the report easier to interpret before submission.',
+      next: 'Submit report',
+    },
+  };
+  const currentMeta = step !== 'confirmation' ? stepMeta[step] : null;
+  const canContinue =
+    step === 'vaccine' ? Boolean(formData.vaccineType && formData.dose && formData.date) :
+    step === 'location' ? Boolean(formData.location.trim()) :
+    step === 'symptoms' ? formData.symptoms.length > 0 :
+    step === 'severity' ? Boolean(formData.severity) :
+    true;
+
+  const goBack = () => {
+    if (step === 'location') setStep('vaccine');
+    if (step === 'symptoms') setStep('location');
+    if (step === 'severity') setStep('symptoms');
+  };
+
+  const goNext = () => {
+    if (!canContinue) return;
+    if (step === 'vaccine') setStep('location');
+    if (step === 'location') setStep('symptoms');
+    if (step === 'symptoms') setStep('severity');
+    if (step === 'severity') setStep('confirmation');
+  };
 
   const renderVaccineStep = () => (
     <div className="space-y-6">
       <div className="mb-8 space-y-2 border-b border-slate-200 pb-6">
-        <p className="text-sm font-black uppercase tracking-[0.18em] text-health-blue">Step 1</p>
-        <h2 className="text-3xl font-black text-health-navy">Tell us about your vaccination</h2>
-        <p className="text-slate-600">Please provide the details found on your vaccine card.</p>
+        <p className="text-sm font-black uppercase tracking-[0.18em] text-health-blue">{currentMeta?.eyebrow}</p>
+        <h2 className="text-3xl font-black text-health-navy">{currentMeta?.title}</h2>
+        <p className="text-slate-600">{currentMeta?.helper}</p>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -107,9 +156,9 @@ export default function CheckIn() {
   const renderLocationStep = () => (
     <div className="space-y-6">
       <div className="mb-8 space-y-2 border-b border-slate-200 pb-6">
-        <p className="text-sm font-black uppercase tracking-[0.18em] text-health-blue">Step 2</p>
-        <h2 className="text-3xl font-black text-slate-900">Where was the shot given?</h2>
-        <p className="text-slate-600">Search for the healthcare facility or pharmacy.</p>
+        <p className="text-sm font-black uppercase tracking-[0.18em] text-health-blue">{currentMeta?.eyebrow}</p>
+        <h2 className="text-3xl font-black text-slate-900">{currentMeta?.title}</h2>
+        <p className="text-slate-600">{currentMeta?.helper}</p>
       </div>
       
       <div className="space-y-4">
@@ -137,9 +186,9 @@ export default function CheckIn() {
   const renderSymptomsStep = () => (
     <div className="space-y-6">
       <div className="mb-8 space-y-2 border-b border-slate-200 pb-6">
-        <p className="text-sm font-black uppercase tracking-[0.18em] text-health-blue">Step 3</p>
-        <h2 className="text-3xl font-black text-health-navy">How are you feeling?</h2>
-        <p className="text-slate-600">Select any symptoms you've experienced since your shot.</p>
+        <p className="text-sm font-black uppercase tracking-[0.18em] text-health-blue">{currentMeta?.eyebrow}</p>
+        <h2 className="text-3xl font-black text-health-navy">{currentMeta?.title}</h2>
+        <p className="text-slate-600">{currentMeta?.helper}</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -172,9 +221,9 @@ export default function CheckIn() {
   const renderSeverityStep = () => (
     <div className="space-y-6">
       <div className="mb-8 space-y-2 border-b border-slate-200 pb-6">
-        <p className="text-sm font-black uppercase tracking-[0.18em] text-health-blue">Step 4</p>
-        <h2 className="text-3xl font-black text-health-navy">Just a few more details</h2>
-        <p className="text-slate-600">Help us understand the intensity of your symptoms.</p>
+        <p className="text-sm font-black uppercase tracking-[0.18em] text-health-blue">{currentMeta?.eyebrow}</p>
+        <h2 className="text-3xl font-black text-health-navy">{currentMeta?.title}</h2>
+        <p className="text-slate-600">{currentMeta?.helper}</p>
       </div>
 
       <div className="space-y-6">
@@ -259,16 +308,31 @@ export default function CheckIn() {
   );
 
   return (
-    <div className="bg-slate-100 px-4 py-10 md:py-14">
-      <div className="mx-auto max-w-5xl">
-        <div className="mb-8 bg-white px-6 py-8 shadow-sm md:px-10">
-          <h1 className="text-4xl font-black tracking-tight text-slate-950">V-safe check-in</h1>
-          <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-600">
-            Complete this short demo check-in to report vaccine information and symptoms. This prototype does not submit real health data.
-          </p>
+    <div className="bg-[linear-gradient(180deg,#f8fbff_0%,#eef4f9_48%,#f8fafc_100%)] px-4 py-10 md:py-14">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-8 overflow-hidden rounded-[2rem] border border-white/80 bg-white/88 px-6 py-8 shadow-[0_18px_56px_rgba(15,23,42,0.08)] ring-1 ring-slate-200/70 md:px-10">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-xs font-black uppercase tracking-[0.14em] text-emerald-700">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                Guided flow
+              </div>
+              <h1 className="text-4xl font-black tracking-tight text-slate-950">V-safe check-in</h1>
+              <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-600">
+                A short, structured report that keeps you oriented at each step. This prototype does not submit real health data.
+              </p>
+            </div>
+            <div className="grid grid-cols-3 gap-2 rounded-2xl bg-slate-50 p-2 ring-1 ring-slate-200/70">
+              {['~2 min', '4 steps', 'Demo only'].map(item => (
+                <div key={item} className="rounded-xl bg-white px-3 py-2 text-center text-xs font-black text-slate-600 shadow-sm">
+                  {item}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       {step !== 'confirmation' && (
-        <div className="mb-8 bg-white px-6 py-6 shadow-sm md:px-10">
+        <div className="mb-8 rounded-[1.5rem] border border-white/80 bg-white/88 px-6 py-6 shadow-[0_12px_36px_rgba(15,23,42,0.06)] ring-1 ring-slate-200/70 md:px-10">
           {/* Progress Indicator */}
           <div className="relative flex items-center justify-between">
             <div className="absolute top-1/2 left-0 w-full h-0.5 bg-slate-200 -translate-y-1/2 z-0" />
@@ -298,10 +362,20 @@ export default function CheckIn() {
               );
             })}
           </div>
+          <div className="mt-6 grid gap-3 border-t border-slate-200/70 pt-5 md:grid-cols-[1fr_auto] md:items-center">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-400">Current step</p>
+              <p className="mt-1 text-lg font-black text-slate-950">{currentMeta?.title}</p>
+              <p className="mt-1 text-sm leading-6 text-slate-500">{currentMeta?.helper}</p>
+            </div>
+            <div className="rounded-2xl bg-sky-50 px-4 py-3 text-sm font-bold leading-6 text-health-blue ring-1 ring-sky-100">
+              Next: {currentMeta?.next}
+            </div>
+          </div>
         </div>
       )}
 
-      <div className={`${step === 'confirmation' ? 'bg-white px-6 py-12 shadow-sm md:px-10' : 'border border-slate-200 bg-white p-6 shadow-sm md:p-10'}`}>
+      <div className={`${step === 'confirmation' ? 'rounded-[2rem] border border-white/80 bg-white/88 px-6 py-12 shadow-[0_18px_56px_rgba(15,23,42,0.08)] ring-1 ring-slate-200/70 md:px-10' : 'rounded-[2rem] border border-white/80 bg-white/88 p-6 shadow-[0_18px_56px_rgba(15,23,42,0.08)] ring-1 ring-slate-200/70 md:p-10'}`}>
         <AnimatePresence mode="wait">
           <motion.div
             key={step}
@@ -321,11 +395,7 @@ export default function CheckIn() {
         {step !== 'confirmation' && (
           <div className="mt-12 flex justify-between border-t border-slate-200 pt-8">
             <button
-              onClick={() => {
-                if (step === 'location') setStep('vaccine');
-                if (step === 'symptoms') setStep('location');
-                if (step === 'severity') setStep('symptoms');
-              }}
+              onClick={goBack}
               disabled={step === 'vaccine'}
               className="btn-secondary flex items-center gap-2 group disabled:opacity-0"
             >
@@ -333,15 +403,11 @@ export default function CheckIn() {
               Back
             </button>
             <button
-              onClick={() => {
-                if (step === 'vaccine') setStep('location');
-                if (step === 'location') setStep('symptoms');
-                if (step === 'symptoms') setStep('severity');
-                if (step === 'severity') setStep('confirmation');
-              }}
-              className="btn-primary flex items-center gap-2 group"
+              onClick={goNext}
+              disabled={!canContinue}
+              className="btn-primary flex items-center gap-2 group disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"
             >
-              {step === 'severity' ? 'Submit Report' : 'Next Step'}
+              {currentMeta?.next}
               <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
