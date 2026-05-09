@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
-import { X, Send, Loader2, MessageSquare, ChevronRight, ExternalLink, MapPinned, ShieldCheck, Sparkles, Minimize2, Expand, PictureInPicture2 } from 'lucide-react';
+import { X, Send, Loader2, MessageSquare, ChevronRight, ExternalLink, MapPinned, ShieldCheck, Sparkles, Expand, PictureInPicture2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -38,6 +38,33 @@ interface PanelRect {
 }
 
 type ResizeHandle = 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw';
+
+function CollapseToBubbleIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="3.5" y="4.5" width="11" height="9" rx="2.6" stroke="currentColor" strokeWidth="1.9" />
+      <path d="M7 8h4" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
+      <path d="M7 10.8h2.6" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
+      <path d="M10.8 16.2h3.8" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
+      <path d="m13.2 14.2 2 2-2 2" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="18" cy="16.2" r="3.1" stroke="currentColor" strokeWidth="1.9" />
+      <path d="M18 14.9v2.6M16.7 16.2h2.6" stroke="currentColor" strokeWidth="1.45" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function ReopenAssistantIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="7.3" cy="16" r="3.2" stroke="currentColor" strokeWidth="1.9" />
+      <path d="M7.3 14.6v2.8M5.9 16h2.8" stroke="currentColor" strokeWidth="1.45" strokeLinecap="round" />
+      <path d="M10.8 16h3.7" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
+      <path d="m13.2 13.9 2.1 2.1-2.1 2.1" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
+      <rect x="13.2" y="5" width="7.3" height="8.2" rx="2.4" stroke="currentColor" strokeWidth="1.9" />
+      <path d="M15.7 8.2h2.3M15.7 10.6h1.4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
 
 const PANEL_MIN_WIDTH = 320;
 const PANEL_MIN_HEIGHT = 360;
@@ -644,8 +671,8 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                   height: PANEL_ICON_SIZE,
                 } : undefined}
                 className="fixed bottom-5 right-5 z-50 flex h-[72px] w-[72px] items-center justify-center rounded-full border border-white/80 bg-white/95 text-health-blue shadow-[0_22px_60px_rgba(15,23,42,0.22)] ring-1 ring-sky-100/80 backdrop-blur-2xl transition-transform hover:-translate-y-0.5 hover:shadow-[0_28px_70px_rgba(52,147,214,0.25)] active:scale-95 md:bottom-auto md:right-auto"
-                aria-label="Open Ask V-safe AI"
-                title="Open Ask V-safe AI"
+                aria-label="Reopen Ask V-safe AI"
+                title="Reopen assistant"
               >
                 <span className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_30%_20%,rgba(52,147,214,0.18),transparent_44%),linear-gradient(135deg,rgba(255,255,255,0.96),rgba(245,250,255,0.92))]" />
                 <span className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-white text-violet-500 shadow-sm ring-1 ring-violet-100">
@@ -654,7 +681,7 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                 {messages.length > 0 && (
                   <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald-500 shadow-sm" />
                 )}
-                <MessageSquare className="relative h-8 w-8" strokeWidth={2} />
+                <ReopenAssistantIcon className="relative h-9 w-9" />
               </motion.button>
             ) : (
               <motion.div
@@ -703,10 +730,10 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                         collapseToIcon(isCompact ? panelRectRef.current : getDefaultPanelRect());
                       }}
                       className="rounded-full border border-transparent p-2 text-slate-400 transition-all hover:border-slate-200 hover:bg-white/80 hover:text-health-blue hover:shadow-sm"
-                      aria-label="Collapse assistant to icon"
-                      title="Collapse to icon"
+                      aria-label="Collapse assistant to floating AI bubble"
+                      title="Collapse to floating bubble"
                     >
-                      <Minimize2 className="h-5 w-5" />
+                      <CollapseToBubbleIcon className="h-5 w-5" />
                     </button>
                     <button
                       onClick={() => {
