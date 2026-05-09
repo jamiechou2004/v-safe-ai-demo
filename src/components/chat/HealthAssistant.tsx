@@ -61,7 +61,7 @@ const PANEL_DEFAULT_WIDTH = 448;
 const PANEL_DEFAULT_HEIGHT = 640;
 const PANEL_MAX_WIDTH = 720;
 const PANEL_MAX_HEIGHT = 820;
-const PANEL_ICON_SIZE = 72;
+const PANEL_ICON_SIZE = 64;
 const PANEL_MARGIN = 16;
 const PANEL_STORAGE_KEY = 'v-safe-ai-panel-rect';
 const ICON_STORAGE_KEY = 'v-safe-ai-icon-position';
@@ -657,19 +657,18 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                   width: PANEL_ICON_SIZE,
                   height: PANEL_ICON_SIZE,
                 } : undefined}
-                className="fixed bottom-5 right-5 z-50 flex h-[72px] w-[72px] items-center justify-center rounded-full border border-white/85 bg-white/95 text-health-blue shadow-[0_22px_60px_rgba(15,23,42,0.22)] ring-1 ring-sky-100/80 backdrop-blur-2xl transition-transform hover:-translate-y-0.5 hover:shadow-[0_28px_70px_rgba(52,147,214,0.25)] active:scale-95 md:bottom-auto md:right-auto"
+                className="fixed bottom-5 right-5 z-50 flex h-16 w-16 items-center justify-center rounded-full border border-white/80 bg-white/95 text-health-blue shadow-[0_16px_42px_rgba(15,23,42,0.18)] backdrop-blur-xl transition-transform hover:-translate-y-0.5 hover:shadow-[0_20px_48px_rgba(52,147,214,0.22)] active:scale-95 md:bottom-auto md:right-auto"
                 aria-label="Reopen Ask V-safe AI"
                 title="Reopen Ask V-safe AI"
               >
-                <span className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_50%_42%,rgba(52,147,214,0.16),transparent_48%),linear-gradient(135deg,rgba(255,255,255,0.98),rgba(244,250,255,0.94))]" />
-                <span className="absolute inset-[9px] rounded-full border border-sky-100/80 bg-white/78 shadow-[inset_0_0_0_1px_rgba(52,147,214,0.08)]" />
-                <span className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-white text-violet-500 shadow-sm ring-1 ring-violet-100" aria-hidden="true">
-                  <Sparkles className="h-3.5 w-3.5" />
+                <span className="absolute inset-0 rounded-full bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(246,251,255,0.94))]" />
+                <span className="absolute -right-0.5 -top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-white text-violet-500 shadow-sm ring-1 ring-violet-100" aria-hidden="true">
+                  <Sparkles className="h-3 w-3" />
                 </span>
                 {messages.length > 0 && (
-                  <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald-500 shadow-sm" aria-hidden="true" />
+                  <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald-500 shadow-sm" aria-hidden="true" />
                 )}
-                <MessageSquare className="relative h-8 w-8" strokeWidth={2.15} />
+                <MessageSquare className="relative h-8 w-8" strokeWidth={2.1} />
                 <span className="sr-only">Ask V-safe AI is minimized. Reopen assistant.</span>
               </motion.button>
             ) : (
