@@ -53,19 +53,6 @@ function CollapseToBubbleIcon({ className }: { className?: string }) {
   );
 }
 
-function ReopenAssistantIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <circle cx="7.3" cy="16" r="3.2" stroke="currentColor" strokeWidth="1.9" />
-      <path d="M7.3 14.6v2.8M5.9 16h2.8" stroke="currentColor" strokeWidth="1.45" strokeLinecap="round" />
-      <path d="M10.8 16h3.7" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
-      <path d="m13.2 13.9 2.1 2.1-2.1 2.1" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
-      <rect x="13.2" y="5" width="7.3" height="8.2" rx="2.4" stroke="currentColor" strokeWidth="1.9" />
-      <path d="M15.7 8.2h2.3M15.7 10.6h1.4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
-  );
-}
-
 const PANEL_MIN_WIDTH = 320;
 const PANEL_MIN_HEIGHT = 360;
 const PANEL_COLLAPSE_WIDTH = 340;
@@ -670,18 +657,20 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                   width: PANEL_ICON_SIZE,
                   height: PANEL_ICON_SIZE,
                 } : undefined}
-                className="fixed bottom-5 right-5 z-50 flex h-[72px] w-[72px] items-center justify-center rounded-full border border-white/80 bg-white/95 text-health-blue shadow-[0_22px_60px_rgba(15,23,42,0.22)] ring-1 ring-sky-100/80 backdrop-blur-2xl transition-transform hover:-translate-y-0.5 hover:shadow-[0_28px_70px_rgba(52,147,214,0.25)] active:scale-95 md:bottom-auto md:right-auto"
+                className="fixed bottom-5 right-5 z-50 flex h-[72px] w-[72px] items-center justify-center rounded-full border border-white/85 bg-white/95 text-health-blue shadow-[0_22px_60px_rgba(15,23,42,0.22)] ring-1 ring-sky-100/80 backdrop-blur-2xl transition-transform hover:-translate-y-0.5 hover:shadow-[0_28px_70px_rgba(52,147,214,0.25)] active:scale-95 md:bottom-auto md:right-auto"
                 aria-label="Reopen Ask V-safe AI"
-                title="Reopen assistant"
+                title="Reopen Ask V-safe AI"
               >
-                <span className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_30%_20%,rgba(52,147,214,0.18),transparent_44%),linear-gradient(135deg,rgba(255,255,255,0.96),rgba(245,250,255,0.92))]" />
-                <span className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-white text-violet-500 shadow-sm ring-1 ring-violet-100">
+                <span className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_50%_42%,rgba(52,147,214,0.16),transparent_48%),linear-gradient(135deg,rgba(255,255,255,0.98),rgba(244,250,255,0.94))]" />
+                <span className="absolute inset-[9px] rounded-full border border-sky-100/80 bg-white/78 shadow-[inset_0_0_0_1px_rgba(52,147,214,0.08)]" />
+                <span className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-white text-violet-500 shadow-sm ring-1 ring-violet-100" aria-hidden="true">
                   <Sparkles className="h-3.5 w-3.5" />
                 </span>
                 {messages.length > 0 && (
-                  <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald-500 shadow-sm" />
+                  <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald-500 shadow-sm" aria-hidden="true" />
                 )}
-                <ReopenAssistantIcon className="relative h-9 w-9" />
+                <MessageSquare className="relative h-8 w-8" strokeWidth={2.15} />
+                <span className="sr-only">Ask V-safe AI is minimized. Reopen assistant.</span>
               </motion.button>
             ) : (
               <motion.div
