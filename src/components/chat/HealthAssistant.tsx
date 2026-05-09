@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
-import { X, Send, Loader2, MessageSquare, ChevronRight, ExternalLink, MapPinned, ShieldCheck, Sparkles, Minimize2, PanelRightOpen } from 'lucide-react';
+import { X, Send, Loader2, MessageSquare, ChevronRight, ExternalLink, MapPinned, ShieldCheck, Sparkles, Minimize2, Expand, PictureInPicture2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -585,7 +585,8 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
   };
 
   const isNarrowPanel = isCompact && isDesktop && panelRect.width < 390;
-  const panelControlsLabel = isCompact ? 'Dock assistant to side' : 'Use floating assistant panel';
+  const panelToggleLabel = isCompact ? 'Expand assistant workspace' : 'Return to floating assistant panel';
+  const panelToggleTitle = isCompact ? 'Expand workspace' : 'Return to floating panel';
 
   const handleConfirmNavigation = (message: Message) => {
     if (!message.action) return;
@@ -713,10 +714,25 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                         setIsCompact(value => !value);
                       }}
                       className="rounded-full border border-transparent p-2 text-slate-400 transition-all hover:border-slate-200 hover:bg-white/80 hover:text-health-blue hover:shadow-sm"
-                      aria-label={panelControlsLabel}
-                      title={isCompact ? 'Dock to side' : 'Floating panel'}
+                      aria-label={panelToggleLabel}
+                      title={panelToggleTitle}
                     >
-                      <PanelRightOpen className="h-5 w-5" />
+                      <AnimatePresence mode="wait" initial={false}>
+                        <motion.span
+                          key={isCompact ? 'expand-workspace' : 'return-floating'}
+                          initial={{ opacity: 0, scale: 0.82, rotate: isCompact ? -8 : 8 }}
+                          animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                          exit={{ opacity: 0, scale: 0.82, rotate: isCompact ? 8 : -8 }}
+                          transition={{ duration: 0.16, ease: 'easeOut' }}
+                          className="block"
+                        >
+                          {isCompact ? (
+                            <Expand className="h-5 w-5" strokeWidth={2.15} />
+                          ) : (
+                            <PictureInPicture2 className="h-5 w-5" strokeWidth={2.15} />
+                          )}
+                        </motion.span>
+                      </AnimatePresence>
                     </button>
                     <button 
                       onClick={() => setIsOpen(false)}
