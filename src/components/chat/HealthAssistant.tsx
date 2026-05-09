@@ -41,6 +41,8 @@ type ResizeHandle = 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw';
 
 const PANEL_MIN_WIDTH = 320;
 const PANEL_MIN_HEIGHT = 360;
+const PANEL_COLLAPSE_WIDTH = 340;
+const PANEL_COLLAPSE_HEIGHT = 390;
 const PANEL_DEFAULT_WIDTH = 448;
 const PANEL_DEFAULT_HEIGHT = 640;
 const PANEL_MAX_WIDTH = 720;
@@ -49,6 +51,7 @@ const PANEL_ICON_SIZE = 72;
 const PANEL_MARGIN = 16;
 const PANEL_STORAGE_KEY = 'v-safe-ai-panel-rect';
 const ICON_STORAGE_KEY = 'v-safe-ai-icon-position';
+const MESSAGES_STORAGE_KEY = 'v-safe-ai-messages';
 
 function getDefaultPanelRect(): PanelRect {
   if (typeof window === 'undefined') {
@@ -113,16 +116,19 @@ function getCollapsedIconPosition(rect: PanelRect) {
   });
 }
 
-function getPanelRectFromIcon(position: { x: number; y: number }, currentRect: PanelRect) {
-  return constrainPanelRect({
-    ...currentRect,
-    x: position.x + PANEL_ICON_SIZE - currentRect.width,
-    y: position.y + PANEL_ICON_SIZE - currentRect.height,
-  });
-}
-
 function getInitialIconPosition(rect: PanelRect) {
   return constrainIconPosition(getStoredJson<{ x: number; y: number }>(ICON_STORAGE_KEY) || getCollapsedIconPosition(rect));
+}
+
+function getInitialMessages() {
+  if (typeof window === 'undefined') return [];
+
+  try {
+    const stored = window.sessionStorage.getItem(MESSAGES_STORAGE_KEY);
+    return stored ? JSON.parse(stored) as Message[] : [];
+  } catch {
+    return [];
+  }
 }
 
 const VSAFE_INFO = `Of course. V-safe is meant to make the after-vaccination follow-up feel simple instead of confusing.
@@ -306,7 +312,7 @@ This is a demo, so do not enter real sensitive medical information. If you are u
 }
 
 export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantProps) {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>(() => getInitialMessages());
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isCompact, setIsCompact] = useState(true);
@@ -320,6 +326,7 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
   const savedScrollTopRef = useRef(0);
   const panelRectRef = useRef(panelRect);
   const iconPositionRef = useRef(iconPosition);
+  const modeBeforeCollapseRef = useRef<'floating' | 'docked'>('floating');
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -341,6 +348,11 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
     window.localStorage.setItem(ICON_STORAGE_KEY, JSON.stringify(iconPosition));
   }, [iconPosition]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    window.sessionStorage.setItem(MESSAGES_STORAGE_KEY, JSON.stringify(messages));
+  }, [messages]);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -359,6 +371,7 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
 
   const collapseToIcon = (rect: PanelRect = panelRectRef.current) => {
     saveScrollPosition();
+    modeBeforeCollapseRef.current = isCompact ? 'floating' : 'docked';
     const stableRect = constrainPanelRect(rect);
     setPanelRect(stableRect);
     setIconPosition(getCollapsedIconPosition(stableRect));
@@ -367,9 +380,9 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
   };
 
   const expandFromIcon = () => {
-    setIsCompact(true);
+    setIsCompact(modeBeforeCollapseRef.current === 'floating');
     setIsCollapsed(false);
-    setPanelRect(rect => getPanelRectFromIcon(iconPositionRef.current, constrainPanelRect(rect)));
+    setPanelRect(rect => constrainPanelRect(rect));
     restoreScrollPosition();
   };
 
@@ -471,6 +484,14 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
       if (handle.includes('n')) {
         nextRect.height = startRect.height - dy;
         nextRect.y = startRect.y + dy;
+      }
+
+      if (nextRect.width < PANEL_COLLAPSE_WIDTH || nextRect.height < PANEL_COLLAPSE_HEIGHT) {
+        collapseToIcon(startRect);
+        window.removeEventListener('pointermove', handleMove);
+        window.removeEventListener('pointerup', handleUp);
+        setInteractionMode('idle');
+        return;
       }
 
       setPanelRect(constrainPanelRect(nextRect));
