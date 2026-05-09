@@ -2,8 +2,15 @@ export interface UniversityRecord {
   name: string;
   aliases: string[];
   immunizationUrl: string;
+  resourceLabel?: string;
+  additionalResources?: {
+    label: string;
+    url: string;
+  }[];
   commonRequirementTags: string[];
+  guidanceItems?: string[];
   notes: string;
+  sourceCaveat?: string;
 }
 
 const commonTags = ['MMR', 'Tdap', 'Meningococcal', 'Varicella', 'Hepatitis B'];
@@ -55,6 +62,38 @@ export const universities: UniversityRecord[] = [
   { name: 'Georgia Tech', aliases: ['georgia tech', 'gatech'], immunizationUrl: 'https://health.gatech.edu/immunization/requirements', commonRequirementTags: commonTags, notes: 'Georgia Tech Stamps Health Services publishes immunization requirements.' },
   { name: 'Emory University', aliases: ['emory'], immunizationUrl: 'https://studenthealth.emory.edu/services/immunization.html', commonRequirementTags: commonTags, notes: 'Emory Student Health Services provides immunization information.' },
   { name: 'University of Georgia', aliases: ['university of georgia', 'uga'], immunizationUrl: 'https://healthcenter.uga.edu/info/immunizations/', commonRequirementTags: commonTags, notes: 'UGA University Health Center provides immunization information.' },
+  {
+    name: 'SCAD',
+    aliases: [
+      'scad',
+      'savannah college of art and design',
+      'scad atlanta',
+      'scad savannah',
+      'savannah college art design',
+      'savannah college',
+    ],
+    immunizationUrl: 'https://www.scad.edu/life/health-and-wellness/student-health-services',
+    resourceLabel: 'SCAD student health services',
+    additionalResources: [
+      {
+        label: 'SCAD health care for international students',
+        url: 'https://www.scad.edu/life/international-student-life/prepare-life-scad/health-care-international-students',
+      },
+      {
+        label: 'SCAD vaccination status information',
+        url: 'https://www.scad.edu/content/upload-your-vaccination-status-or-test-results-fall-quarter',
+      },
+    ],
+    commonRequirementTags: ['Student health services', 'Health insurance', 'International student health care', 'MySCAD health tasks', 'Vaccination status updates'],
+    guidanceItems: [
+      'Start with SCAD Student Health Services for current campus health contacts and instructions.',
+      'International students should also review SCAD health care guidance because insurance and access rules can differ by visa status.',
+      'If SCAD asks for forms or uploads, verify them in MySCAD or your admissions/student portal before submitting records.',
+      'Do not rely on a generic vaccine list unless SCAD publishes it for your program, campus, term, or residency status.',
+    ],
+    notes: 'SCAD has official health services and international student health care resources. The public SCAD pages found here do not present a single broad immunization-requirements list, so the safest answer is to route students to SCAD official health resources and MySCAD instructions instead of guessing specific required vaccines.',
+    sourceCaveat: 'I found official SCAD health resources, but not a single public SCAD page that clearly lists all required routine immunizations. Use SCAD Student Health Services, MySCAD, and admissions instructions as the source of truth.',
+  },
   { name: 'University of Texas at Austin', aliases: ['ut austin', 'university of texas at austin', 'utexas'], immunizationUrl: 'https://healthyhorns.utexas.edu/requiredvaccine/index.html', commonRequirementTags: commonTags, notes: 'UT Austin University Health Services publishes required vaccine information.' },
   { name: 'Texas A&M University', aliases: ['texas a&m', 'texas a and m', 'tamu'], immunizationUrl: 'https://uhs.tamu.edu/medical/immunizations.html', commonRequirementTags: commonTags, notes: 'Texas A&M University Health Services provides immunization information.' },
   { name: 'Rice University', aliases: ['rice'], immunizationUrl: 'https://health.rice.edu/new-students/immunization-requirements', commonRequirementTags: commonTags, notes: 'Rice Student Health Services lists immunization requirements.' },
@@ -121,11 +160,18 @@ const vaccineContextTerms = [
   'vaccine',
   'vaccines',
   'vaccination',
+  'vaccinated',
   'immunization',
   'immunisation',
+  'immunizations',
+  'immunisations',
   'requirement',
   'requirements',
   'required',
+  'require',
+  'requires',
+  'need',
+  'needed',
   'student health',
   'health requirement',
   'health requirements',
@@ -155,9 +201,29 @@ const educationContextTerms = [
   'student',
   'freshman',
   'incoming',
+  'college student',
+  'new student',
+  'admission',
+  'admissions',
+  'enrollment',
+  'resident',
+  'residence hall',
+  'housing',
   '大学',
   '学校',
   '学生',
+];
+
+const schoolOnlyVaccineQuestionTerms = [
+  'what',
+  'which',
+  'do i',
+  'does',
+  'require',
+  'requires',
+  'required',
+  'need',
+  'needed',
 ];
 
 function normalizeText(value: string) {
@@ -181,6 +247,7 @@ function hasAnyContext(normalizedQuery: string, terms: string[]) {
 function getUniversityScore(school: UniversityRecord, normalizedQuery: string) {
   const hasVaccineContext = hasAnyContext(normalizedQuery, vaccineContextTerms);
   const hasEducationContext = hasAnyContext(normalizedQuery, educationContextTerms);
+  const hasSchoolOnlyQuestionContext = hasAnyContext(normalizedQuery, schoolOnlyVaccineQuestionTerms);
   const allNames = [school.name, ...school.aliases];
 
   return allNames.reduce((bestScore, name) => {
@@ -188,10 +255,12 @@ function getUniversityScore(school: UniversityRecord, normalizedQuery: string) {
     if (!hasPhrase(normalizedQuery, normalizedName)) return bestScore;
 
     const isShortAlias = normalizedName.length <= 3;
-    if (isShortAlias && !hasVaccineContext && !hasEducationContext) return bestScore;
+    const isKnownAcronymSchool = normalizeText(school.name) === normalizedName;
+    if (isShortAlias && !hasVaccineContext && !hasEducationContext && !hasSchoolOnlyQuestionContext) return bestScore;
 
     const score =
       normalizedName === normalizeText(school.name) ? 100 :
+      isShortAlias && isKnownAcronymSchool ? 88 :
       isShortAlias ? 72 :
       normalizedName.split(' ').length > 1 ? 90 :
       82;
@@ -202,7 +271,11 @@ function getUniversityScore(school: UniversityRecord, normalizedQuery: string) {
 
 export function hasSchoolVaccineIntent(query: string) {
   const normalized = normalizeText(query);
-  return hasAnyContext(normalized, vaccineContextTerms) && hasAnyContext(normalized, educationContextTerms);
+  const hasVaccineContext = hasAnyContext(normalized, vaccineContextTerms);
+  const hasEducationContext = hasAnyContext(normalized, educationContextTerms);
+  const hasKnownSchool = Boolean(findUniversityByQuery(query));
+
+  return hasVaccineContext && (hasEducationContext || hasKnownSchool);
 }
 
 export function findUniversityByQuery(query: string) {
@@ -213,4 +286,29 @@ export function findUniversityByQuery(query: string) {
     .sort((a, b) => b.score - a.score);
 
   return ranked[0]?.school;
+}
+
+export function formatUniversityVaccineGuidance(school: UniversityRecord) {
+  const resourceLabel = school.resourceLabel || `${school.name} immunization requirements`;
+  const reviewItems = school.guidanceItems || school.commonRequirementTags.map(tag => `Review ${tag} requirements or documentation instructions.`);
+  const additionalResources = school.additionalResources?.length
+    ? `\n\nAdditional official resources:\n${school.additionalResources.map(resource => `- [${resource.label}](${resource.url})`).join('\n')}`
+    : '';
+  const caveat = school.sourceCaveat
+    ? `\n\nImportant source note:\n${school.sourceCaveat}`
+    : '';
+
+  return `**${school.name}: use official university health resources first.**
+
+Primary source:
+
+[${resourceLabel}](${school.immunizationUrl})${additionalResources}
+
+What to check:
+${reviewItems.map(item => `- ${item}`).join('\n')}
+
+Why this is the right source:
+${school.notes}${caveat}
+
+Requirements can change by program, campus, residency status, deadline, and term. Use the official university resources above as the source of truth, then check upload instructions and exemption rules if they apply to you.`;
 }
