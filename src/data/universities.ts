@@ -290,25 +290,43 @@ export function findUniversityByQuery(query: string) {
 
 export function formatUniversityVaccineGuidance(school: UniversityRecord) {
   const resourceLabel = school.resourceLabel || `${school.name} immunization requirements`;
-  const reviewItems = school.guidanceItems || school.commonRequirementTags.map(tag => `Review ${tag} requirements or documentation instructions.`);
+  const requirementItems = school.commonRequirementTags.map(tag => `**${tag}:** review whether this item is required, recommended, or needs documentation for your campus/program.`);
+  const reviewItems = school.guidanceItems || [
+    'Open the official university health page and confirm the current requirement list.',
+    'Check the student portal for upload instructions, exemption forms, and deadline dates.',
+    'Confirm whether requirements differ for housing, international students, clinical programs, or your first term.',
+  ];
   const additionalResources = school.additionalResources?.length
-    ? `\n\nAdditional official resources:\n${school.additionalResources.map(resource => `- [${resource.label}](${resource.url})`).join('\n')}`
+    ? `\n${school.additionalResources.map(resource => `- [${resource.label}](${resource.url})`).join('\n')}`
     : '';
   const caveat = school.sourceCaveat
-    ? `\n\nImportant source note:\n${school.sourceCaveat}`
+    ? `\n\n> **Source note:** ${school.sourceCaveat}`
     : '';
 
-  return `**${school.name}: use official university health resources first.**
+  return `## ${school.name}
 
-Primary source:
+> Use the official university health resource as the source of truth. Requirements can change by program, campus, residency status, deadline, and term.
 
-[${resourceLabel}](${school.immunizationUrl})${additionalResources}
+### Recognized institution
+- **School:** ${school.name}
+- **Official source found:** ${resourceLabel}
 
-What to check:
+### What you need to know
+- ${school.notes}
+- **Do not rely on a generic vaccine list alone.** Verify the current instructions on the school's own health page or student portal.
+- **Deadlines may vary.** This demo does not store every term-specific deadline, so confirm dates in the official portal.
+
+### Required vaccines or items to review
+${requirementItems.map(item => `- ${item}`).join('\n')}
+
+### Submission steps to check
 ${reviewItems.map(item => `- ${item}`).join('\n')}
 
-Why this is the right source:
-${school.notes}${caveat}
+### Official source
+- [${resourceLabel}](${school.immunizationUrl})${additionalResources}${caveat}
 
-Requirements can change by program, campus, residency status, deadline, and term. Use the official university resources above as the source of truth, then check upload instructions and exemption rules if they apply to you.`;
+### What you can do next
+- Open the official link and confirm the current requirement list.
+- Prepare immunization records before uploading anything.
+- Ask me another school name if you want a different university checked.`;
 }

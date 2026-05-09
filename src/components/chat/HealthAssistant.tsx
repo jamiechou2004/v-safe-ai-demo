@@ -852,8 +852,43 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                           <div className={`markdown-body leading-6 ${msg.role === 'assistant' ? 'px-4 py-3' : ''}`}>
                             <ReactMarkdown
                               components={{
+                                h2: ({ children }) => (
+                                  <h2 className="mb-3 text-xl font-black tracking-tight text-slate-950">
+                                    {children}
+                                  </h2>
+                                ),
+                                h3: ({ children }) => (
+                                  <h3 className="mt-4 mb-2 rounded-xl border border-sky-100 bg-sky-50/70 px-3 py-2 text-[11px] font-black uppercase tracking-[0.14em] text-sky-800">
+                                    {children}
+                                  </h3>
+                                ),
+                                p: ({ children }) => (
+                                  <p className="mb-3 last:mb-0">
+                                    {children}
+                                  </p>
+                                ),
+                                ul: ({ children }) => (
+                                  <ul className="mb-3 space-y-1.5 pl-1 last:mb-0">
+                                    {children}
+                                  </ul>
+                                ),
+                                li: ({ children }) => (
+                                  <li className="relative list-none pl-5 text-slate-700 before:absolute before:left-0 before:top-[0.65em] before:h-1.5 before:w-1.5 before:rounded-full before:bg-health-blue/70">
+                                    {children}
+                                  </li>
+                                ),
+                                blockquote: ({ children }) => (
+                                  <blockquote className="mb-3 rounded-2xl border border-emerald-100 bg-emerald-50/70 px-3 py-2.5 text-sm font-semibold leading-6 text-emerald-900">
+                                    {children}
+                                  </blockquote>
+                                ),
+                                strong: ({ children }) => (
+                                  <strong className="font-black text-slate-950">
+                                    {children}
+                                  </strong>
+                                ),
                                 a: ({ children, href }) => (
-                                  <a href={href} target="_blank" rel="noopener noreferrer" className="font-bold underline underline-offset-2">
+                                  <a href={href} target="_blank" rel="noopener noreferrer" className="inline-flex max-w-full items-center rounded-full border border-sky-100 bg-white px-2.5 py-1 text-xs font-black text-health-blue shadow-sm transition hover:border-sky-200 hover:bg-sky-50">
                                     {children}
                                   </a>
                                 ),
