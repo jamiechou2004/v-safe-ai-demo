@@ -1,9 +1,11 @@
 import { Mail, Phone, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import VSafeLogo from '../common/VSafeLogo';
+import { useLanguage } from '../../i18n';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const { t } = useLanguage();
 
   return (
     <footer className="bg-slate-900 text-slate-300 py-12 px-4 border-t border-slate-800">
@@ -13,7 +15,7 @@ export default function Footer() {
             <VSafeLogo inverted compact />
           </div>
           <p className="text-slate-400 max-w-md mb-8 leading-relaxed">
-            A research-based redesign focusing on the patient experience. V-safe is a safety monitoring system that allows you to share how you feel after your vaccination.
+            {t('footer.body')}
           </p>
           <div className="flex gap-4">
             <a href="#" className="p-2 bg-slate-800 rounded-full hover:bg-health-green/20 hover:text-health-green transition-all">
@@ -26,25 +28,25 @@ export default function Footer() {
         </div>
 
         <div>
-          <h4 className="text-white font-bold mb-6">Resources</h4>
+          <h4 className="text-white font-bold mb-6">{t('footer.resources')}</h4>
           <ul className="space-y-4 text-sm">
             <li>
-              <Link to="/" className="hover:text-health-green transition-colors">Home</Link>
+              <Link to="/" className="hover:text-health-green transition-colors">{t('footer.home')}</Link>
             </li>
             <li>
-              <Link to="/check-in" className="hover:text-health-green transition-colors">Safety Check-in</Link>
+              <Link to="/check-in" className="hover:text-health-green transition-colors">{t('footer.checkin')}</Link>
             </li>
             <li>
-              <Link to="/emergency" className="hover:text-health-green transition-colors">Emergency Info</Link>
+              <Link to="/emergency" className="hover:text-health-green transition-colors">{t('footer.emergency')}</Link>
             </li>
             <li>
-              <Link to="/privacy" className="hover:text-health-green transition-colors">Privacy Policy</Link>
+              <Link to="/privacy" className="hover:text-health-green transition-colors">{t('footer.privacy')}</Link>
             </li>
           </ul>
         </div>
 
         <div>
-          <h4 className="text-white font-bold mb-6">Official Links</h4>
+          <h4 className="text-white font-bold mb-6">{t('footer.official')}</h4>
           <ul className="space-y-4 text-sm">
             <li>
               <a href="https://vsafe.cdc.gov" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-health-green transition-colors">
@@ -53,12 +55,12 @@ export default function Footer() {
             </li>
             <li>
               <a href="https://www.cdc.gov/vaccines" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-health-green transition-colors">
-                Vaccine Information <ExternalLink className="w-3 h-3" />
+                {t('footer.vaccineInfo')} <ExternalLink className="w-3 h-3" />
               </a>
             </li>
             <li>
               <a href="https://vaers.hhs.gov" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-health-green transition-colors">
-                VAERS Reporting <ExternalLink className="w-3 h-3" />
+                {t('footer.vaers')} <ExternalLink className="w-3 h-3" />
               </a>
             </li>
           </ul>
@@ -66,7 +68,7 @@ export default function Footer() {
       </div>
 
       <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-slate-800 text-center text-xs text-slate-500">
-        <p>© {currentYear} v-safe ai demo. Built for demonstration purposes. Not an official government tool.</p>
+        <p>© {currentYear} v-safe ai demo. {t('footer.demo')}</p>
       </div>
     </footer>
   );

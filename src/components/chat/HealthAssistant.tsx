@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getHealthAssistantResponse } from '../../services/geminiService';
 import { findUniversityByQuery, formatUniversityVaccineGuidance, hasSchoolVaccineIntent } from '../../data/universities';
+import { useLanguage } from '../../i18n';
 
 interface Message {
   id: string;
@@ -326,6 +327,7 @@ This is a demo, so do not enter real sensitive medical information. If you are u
 }
 
 export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantProps) {
+  const { t } = useLanguage();
   const [messages, setMessages] = useState<Message[]>(() => getInitialMessages());
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -706,9 +708,9 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                     </div>
                     <div className="min-w-0">
                       <p className="text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">V-safe AI demo</p>
-                      <h2 className={`${isCompact ? 'text-lg' : 'text-2xl'} truncate font-black tracking-tight text-slate-950`}>Ask V-safe AI</h2>
+                      <h2 className={`${isCompact ? 'text-lg' : 'text-2xl'} truncate font-black tracking-tight text-slate-950`}>{t('chat.ask')}</h2>
                       {!isNarrowPanel && (
-                        <p className="mt-0.5 max-w-[280px] text-xs font-semibold leading-5 text-slate-500">Navigation, check-in support, and campus vaccine links</p>
+                        <p className="mt-0.5 max-w-[280px] text-xs font-semibold leading-5 text-slate-500">{t('assistant.subtitle')}</p>
                       )}
                     </div>
                   </div>
@@ -763,7 +765,7 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                     <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-health-green ring-1 ring-emerald-100">
                       <ShieldCheck className="h-4 w-4" />
                     </span>
-                    <span>Guides pages, explains V-safe, and finds campus vaccine links</span>
+                    <span>{t('assistant.capability')}</span>
                   </div>
                 </div>
               </div>
@@ -783,19 +785,19 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                         <div>
                           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50/80 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.12em] text-emerald-700">
                             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_0_4px_rgba(16,185,129,0.12)]" />
-                            Ready to guide
+                            {t('assistant.ready')}
                           </div>
-                          <h3 className="text-2xl font-black tracking-tight text-slate-950">How can I help today?</h3>
+                          <h3 className="text-2xl font-black tracking-tight text-slate-950">{t('assistant.emptyTitle')}</h3>
                         </div>
                         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-slate-950 text-white shadow-[0_16px_32px_rgba(15,23,42,0.18)]">
                           <Sparkles className="h-5 w-5" />
                         </div>
                       </div>
                       <p className="mt-3 text-sm leading-6 text-slate-600">
-                        Ask naturally. I can route you to the right page, explain V-safe in plain language, or find a university vaccine requirement link.
+                        {t('assistant.emptyBody')}
                       </p>
                       <div className={`mt-5 grid gap-2 text-center ${isNarrowPanel ? 'grid-cols-1' : 'grid-cols-3'}`}>
-                        {['Navigation', 'V-safe info', 'Campus links'].map(item => (
+                        {[t('assistant.nav'), t('assistant.info'), t('assistant.campus')].map(item => (
                           <div key={item} className="rounded-xl border border-slate-200/70 bg-slate-50/70 px-2 py-2 text-[11px] font-black text-slate-500 sm:rounded-2xl">
                             {item}
                           </div>
@@ -812,8 +814,8 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                           <MapPinned className="h-5 w-5" />
                         </span>
                         <span className="min-w-0 flex-1">
-                          <span className="block text-sm font-black text-slate-950">{location.pathname === '/check-in' ? 'Help with this sign up' : 'Take me to sign up'}</span>
-                          <span className="mt-0.5 block text-xs font-semibold text-slate-500">{location.pathname === '/check-in' ? 'Get field-by-field guidance.' : 'I will ask before opening the page.'}</span>
+                          <span className="block text-sm font-black text-slate-950">{location.pathname === '/check-in' ? t('assistant.formHelp') : t('assistant.signUp')}</span>
+                          <span className="mt-0.5 block text-xs font-semibold text-slate-500">{location.pathname === '/check-in' ? t('assistant.formHelpBody') : t('assistant.signUpHelp')}</span>
                         </span>
                         <ChevronRight className="h-4 w-4 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-health-blue" />
                       </button>
@@ -825,8 +827,8 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                           <ExternalLink className="h-5 w-5" />
                         </span>
                         <span className="min-w-0 flex-1">
-                          <span className="block text-sm font-black text-slate-950">College vaccine requirements</span>
-                          <span className="mt-0.5 block text-xs font-semibold text-slate-500">Ask generally or name a school.</span>
+                          <span className="block text-sm font-black text-slate-950">{t('assistant.college')}</span>
+                          <span className="mt-0.5 block text-xs font-semibold text-slate-500">{t('assistant.collegeBody')}</span>
                         </span>
                         <ChevronRight className="h-4 w-4 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-health-purple" />
                       </button>
@@ -838,8 +840,8 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                           <MessageSquare className="h-5 w-5" />
                         </span>
                         <span className="min-w-0 flex-1">
-                          <span className="block text-sm font-black text-slate-950">What is V-safe?</span>
-                          <span className="mt-0.5 block text-xs font-semibold text-slate-500">Get a clear, human explanation.</span>
+                          <span className="block text-sm font-black text-slate-950">{t('assistant.whatIs')}</span>
+                          <span className="mt-0.5 block text-xs font-semibold text-slate-500">{t('assistant.whatIsBody')}</span>
                         </span>
                         <ChevronRight className="h-4 w-4 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-health-blue" />
                       </button>
@@ -991,7 +993,7 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                           handleSend();
                         }
                       }}
-                      placeholder="Type your message..."
+                      placeholder={t('assistant.placeholder')}
                       className="block w-full resize-none border-none bg-transparent px-4 py-3 text-sm font-medium text-slate-800 outline-none placeholder:text-slate-400"
                     />
                   </div>
@@ -1007,7 +1009,7 @@ export default function HealthAssistant({ isOpen, setIsOpen }: HealthAssistantPr
                 
                 <div className="mt-3 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-slate-300">
                   <span className="h-px w-8 bg-slate-200" />
-                  Demo only - Not medical advice
+                  {t('assistant.disclaimer')}
                   <span className="h-px w-8 bg-slate-200" />
                 </div>
               </div>

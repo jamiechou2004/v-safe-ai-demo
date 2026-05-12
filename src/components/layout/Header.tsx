@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import StudentDisclaimer from '../common/StudentDisclaimer';
 import VSafeLogo from '../common/VSafeLogo';
+import { languageOptions, useLanguage } from '../../i18n';
 
 interface HeaderProps {
   isChatOpen: boolean;
@@ -12,16 +13,18 @@ interface HeaderProps {
 
 export default function Header({ isChatOpen, onToggleChat, onOpenAuth }: HeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   const location = useLocation();
+  const { currentLanguage, setLanguage, t } = useLanguage();
 
   const mainNavItems = [
-    { name: 'About V-safe', path: '/' },
-    { name: 'Data and Research', path: '/data' },
-    { name: 'How It Works', path: '/how-it-works' },
-    { name: 'Notes for Participants', path: '/notes' },
-    { name: 'Participants', path: '/participants' },
-    { name: 'What\'s New', path: '/news' },
-    { name: 'Data Security and Privacy', path: '/privacy' },
+    { name: t('nav.about'), path: '/' },
+    { name: t('nav.data'), path: '/data' },
+    { name: t('nav.how'), path: '/how-it-works' },
+    { name: t('nav.notes'), path: '/notes' },
+    { name: t('nav.participants'), path: '/participants' },
+    { name: t('nav.news'), path: '/news' },
+    { name: t('nav.privacy'), path: '/privacy' },
   ];
 
   return (
@@ -39,20 +42,48 @@ export default function Header({ isChatOpen, onToggleChat, onOpenAuth }: HeaderP
 
             {/* Top Right Utilities */}
             <div className="hidden min-w-0 shrink-0 items-center gap-2 md:flex lg:gap-4">
-              <button className="flex items-center gap-1.5 whitespace-nowrap text-xs font-semibold text-slate-600 transition-colors hover:text-health-navy lg:text-sm">
-                <Globe className="w-4 h-4" />
-                English
-                <ChevronDown className="w-4 h-4" />
-              </button>
+              <div className="relative">
+                <button
+                  onClick={() => setIsLanguageOpen(open => !open)}
+                  className="flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2 py-2 text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-50 hover:text-health-navy lg:text-sm"
+                  aria-expanded={isLanguageOpen}
+                  aria-label={t('language.label')}
+                >
+                  <Globe className="w-4 h-4" />
+                  {currentLanguage.label}
+                  <ChevronDown className={`w-4 h-4 transition-transform ${isLanguageOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {isLanguageOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-44 overflow-hidden rounded-2xl border border-slate-200 bg-white p-1.5 shadow-xl shadow-slate-950/10">
+                    {languageOptions.map(option => (
+                      <button
+                        key={option.code}
+                        onClick={() => {
+                          setLanguage(option.code);
+                          setIsLanguageOpen(false);
+                        }}
+                        className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-sm font-bold transition ${
+                          currentLanguage.code === option.code
+                            ? 'bg-sky-50 text-health-blue'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-950'
+                        }`}
+                      >
+                        <span>{option.label}</span>
+                        <span className="text-xs font-black text-slate-400">{option.shortLabel}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
               <div className="hidden h-6 w-px bg-slate-200 lg:block" />
               <button onClick={() => onOpenAuth('login')} className="whitespace-nowrap rounded border-2 border-slate-200 px-3 py-2.5 text-xs font-black text-health-navy transition-all hover:border-health-blue/30 hover:bg-slate-50 lg:px-5 lg:py-3 lg:text-sm">
-                Log In
+                {t('auth.login')}
               </button>
               <button
                 onClick={() => onOpenAuth('register')}
                 className="whitespace-nowrap rounded bg-health-blue px-4 py-2.5 text-xs font-black text-white shadow-md shadow-blue-100 transition-all hover:bg-blue-600 lg:px-7 lg:py-3 lg:text-sm"
               >
-                Register Now
+                {t('auth.register')}
               </button>
               <button
                 onClick={onToggleChat}
@@ -64,7 +95,7 @@ export default function Header({ isChatOpen, onToggleChat, onOpenAuth }: HeaderP
                   <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-health-blue shadow-[inset_0_0_0_1px_rgba(52,147,214,0.16),0_5px_14px_rgba(52,147,214,0.12)] transition-transform duration-200 group-hover:scale-105">
                     <MessageSquare className="h-4 w-4" />
                   </span>
-                  Ask V-safe AI
+                  {t('chat.ask')}
                   <Sparkles className="h-3.5 w-3.5 text-violet-500/80 transition-transform duration-200 group-hover:rotate-12 group-hover:scale-110" />
                 </span>
               </button>
@@ -107,8 +138,8 @@ export default function Header({ isChatOpen, onToggleChat, onOpenAuth }: HeaderP
         <div className="md:hidden bg-white border-b border-slate-200 overflow-y-auto max-h-[calc(100vh-80px)]">
           <div className="px-4 py-6 space-y-4">
             <div className="grid grid-cols-2 gap-3 mb-4">
-              <button onClick={() => { setIsOpen(false); onOpenAuth('login'); }} className="text-sm font-bold text-health-navy border-2 border-slate-200 py-3 rounded-lg hover:bg-slate-50 transition-all text-center">Log In</button>
-              <button onClick={() => { setIsOpen(false); onOpenAuth('register'); }} className="bg-health-blue text-white py-3 rounded-lg font-bold text-sm text-center shadow-md shadow-blue-50">Register Now</button>
+              <button onClick={() => { setIsOpen(false); onOpenAuth('login'); }} className="text-sm font-bold text-health-navy border-2 border-slate-200 py-3 rounded-lg hover:bg-slate-50 transition-all text-center">{t('auth.login')}</button>
+              <button onClick={() => { setIsOpen(false); onOpenAuth('register'); }} className="bg-health-blue text-white py-3 rounded-lg font-bold text-sm text-center shadow-md shadow-blue-50">{t('auth.register')}</button>
             </div>
             
             <button
@@ -119,7 +150,7 @@ export default function Header({ isChatOpen, onToggleChat, onOpenAuth }: HeaderP
               className="mb-6 flex w-full items-center justify-center gap-3 rounded-lg bg-health-blue py-4 font-black text-white shadow-lg"
             >
               <MessageSquare className="w-5 h-5" />
-              Ask V-safe AI
+              {t('chat.ask')}
             </button>
             
             <div className="space-y-1">
@@ -140,10 +171,27 @@ export default function Header({ isChatOpen, onToggleChat, onOpenAuth }: HeaderP
             </div>
 
             <div className="pt-6 border-t border-slate-100">
-               <button className="flex items-center gap-2 p-3 w-full font-bold text-slate-600">
+               <div className="space-y-2">
+               <div className="flex items-center gap-2 p-3 w-full font-bold text-slate-600">
                 <Globe className="w-5 h-5 text-health-blue" />
-                Language: English
-              </button>
+                {t('language.label')}: {currentLanguage.label}
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {languageOptions.map(option => (
+                  <button
+                    key={option.code}
+                    onClick={() => setLanguage(option.code)}
+                    className={`rounded-xl border px-3 py-2 text-sm font-black ${
+                      currentLanguage.code === option.code
+                        ? 'border-health-blue bg-sky-50 text-health-blue'
+                        : 'border-slate-200 text-slate-500'
+                    }`}
+                  >
+                    {option.shortLabel}
+                  </button>
+                ))}
+              </div>
+              </div>
             </div>
           </div>
         </div>

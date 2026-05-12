@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, CalendarCheck2, CheckCircle2, ClipboardList, LockKeyhole, MessageSquareText, ShieldCheck, Sparkles, UsersRound } from 'lucide-react';
+import { useLanguage } from '../i18n';
 
 interface HomeProps {
   onOpenAuth: (mode: 'login' | 'register') => void;
@@ -7,24 +8,26 @@ interface HomeProps {
 }
 
 export default function Home({ onOpenAuth, onOpenAssistant }: HomeProps) {
+  const { t } = useLanguage();
+
   const primaryActions = [
     {
-      title: 'Start a check-in',
-      body: 'Register vaccine details and report how you feel in a guided flow.',
+      title: t('home.cardCheckinTitle'),
+      body: t('home.cardCheckinBody'),
       to: '/check-in',
       icon: ClipboardList,
       tone: 'blue',
     },
     {
-      title: 'Ask V-safe AI',
-      body: 'Get help finding pages, understanding V-safe, or locating campus vaccine links.',
+      title: t('home.cardAiTitle'),
+      body: t('home.cardAiBody'),
       to: null,
       icon: Sparkles,
       tone: 'slate',
     },
     {
-      title: 'Manage participants',
-      body: 'Enroll participants, track reminder status, and prepare outreach.',
+      title: t('home.cardParticipantsTitle'),
+      body: t('home.cardParticipantsBody'),
       to: '/participants',
       icon: UsersRound,
       tone: 'green',
@@ -32,9 +35,9 @@ export default function Home({ onOpenAuth, onOpenAssistant }: HomeProps) {
   ];
 
   const journey = [
-    { label: 'Orient', body: 'Understand what V-safe does and what information is needed.' },
-    { label: 'Act', body: 'Complete a short check-in or register a participant.' },
-    { label: 'Follow up', body: 'Review guidance, privacy, and campus requirement links.' },
+    { label: t('home.journeyOrient'), body: t('home.journeyOrientBody') },
+    { label: t('home.journeyAct'), body: t('home.journeyActBody') },
+    { label: t('home.journeyFollow'), body: t('home.journeyFollowBody') },
   ];
 
   return (
@@ -45,33 +48,33 @@ export default function Home({ onOpenAuth, onOpenAssistant }: HomeProps) {
           <div className="max-w-3xl">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-sky-100 bg-sky-50/80 px-3 py-1.5 text-xs font-black uppercase tracking-[0.14em] text-health-blue">
               <span className="h-1.5 w-1.5 rounded-full bg-health-green" />
-              Guided vaccine safety check-ins
+              {t('home.badge')}
             </div>
             <h1 className="text-4xl font-black tracking-tight text-slate-950 md:text-6xl">
-              Know what to do after vaccination.
+              {t('home.heroTitle')}
             </h1>
             <p className="mt-6 text-2xl font-black leading-snug text-slate-900">
-              V-safe helps people report how they feel through simple follow-up check-ins.
+              {t('home.heroLead')}
             </p>
             <div className="mt-8 space-y-5 text-lg leading-8 text-slate-600">
               <p>
-                This demo is organized around the real user journey: understand the system, complete the right action, and get clear support without hunting through pages.
+                {t('home.heroBody1')}
               </p>
               <p>
-                The AI assistant stays available throughout the experience to explain, route, and confirm before moving you somewhere new.
+                {t('home.heroBody2')}
               </p>
             </div>
 
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Link to="/check-in" className="inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-950 px-6 py-4 text-base font-black text-white shadow-[0_18px_40px_rgba(15,23,42,0.20)] transition hover:-translate-y-0.5 hover:bg-slate-800">
-                Start check-in
+                {t('home.start')}
                 <ArrowRight className="h-5 w-5" />
               </Link>
               <button onClick={() => onOpenAuth('register')} className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-4 text-base font-black text-slate-800 shadow-sm transition hover:-translate-y-0.5 hover:border-sky-200 hover:bg-sky-50">
-                Create demo account
+                {t('home.createAccount')}
               </button>
               <button onClick={() => onOpenAuth('login')} className="inline-flex items-center justify-center rounded-2xl px-4 py-4 text-base font-black text-slate-500 transition hover:text-slate-950">
-                Log in
+                {t('home.login')}
               </button>
             </div>
           </div>
@@ -81,9 +84,9 @@ export default function Home({ onOpenAuth, onOpenAssistant }: HomeProps) {
               <div className="grid gap-4 sm:grid-cols-[1fr_120px]">
                 <div className="space-y-4">
                   {[
-                    '2 minutes',
-                    '12 check-ins',
-                    '6 weeks',
+                    t('home.minutes'),
+                    t('home.checkins'),
+                    t('home.weeks'),
                   ].map(item => (
                     <div key={item} className="flex items-center gap-3 text-2xl font-black text-slate-950">
                       <CheckCircle2 className="h-8 w-8 text-health-green" />
@@ -91,7 +94,7 @@ export default function Home({ onOpenAuth, onOpenAssistant }: HomeProps) {
                     </div>
                   ))}
                   <p className="pt-2 text-lg font-black leading-7 text-slate-900">
-                    A short rhythm that makes follow-up feel predictable.
+                    {t('home.rhythm')}
                   </p>
                 </div>
                 <div className="hidden items-end justify-center sm:flex">
@@ -133,11 +136,11 @@ export default function Home({ onOpenAuth, onOpenAssistant }: HomeProps) {
       <section className="mx-auto max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
         <div className="mb-4 flex items-end justify-between gap-4">
           <div>
-            <p className="text-sm font-black uppercase tracking-[0.16em] text-health-blue">Choose a path</p>
-            <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">What do you need right now?</h2>
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-health-blue">{t('home.pathLabel')}</p>
+            <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">{t('home.pathTitle')}</h2>
           </div>
           <p className="hidden max-w-md text-sm font-semibold leading-6 text-slate-500 md:block">
-            Choose the starting point that matches your goal. You can change direction at any time.
+            {t('home.pathBody')}
           </p>
         </div>
         <div className="grid gap-4 md:grid-cols-3">
@@ -153,7 +156,7 @@ export default function Home({ onOpenAuth, onOpenAssistant }: HomeProps) {
                 <h3 className="text-2xl font-black text-slate-950">{item.title}</h3>
                 <p className="mt-3 min-h-[72px] text-base leading-7 text-slate-600">{item.body}</p>
                 <div className="mt-6 inline-flex items-center gap-2 text-sm font-black text-health-blue">
-                  Continue
+                  {t('home.continue')}
                   <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
                 </div>
               </>
@@ -179,15 +182,15 @@ export default function Home({ onOpenAuth, onOpenAssistant }: HomeProps) {
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid gap-10 rounded-[1.75rem] border border-white/80 bg-white/88 px-6 py-12 shadow-[0_16px_44px_rgba(15,23,42,0.07)] ring-1 ring-slate-200/70 lg:grid-cols-[0.85fr_1.15fr] lg:px-12">
           <div className="border-l-4 border-health-blue pl-6">
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-health-blue">About Us</p>
-            <h2 className="mt-3 text-4xl font-black tracking-tight text-slate-950">What V-safe does</h2>
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-health-blue">{t('home.aboutLabel')}</p>
+            <h2 className="mt-3 text-4xl font-black tracking-tight text-slate-950">{t('home.aboutTitle')}</h2>
           </div>
           <div className="space-y-6 text-lg leading-8 text-slate-700">
             <p>
-              V-safe is part of the U.S. vaccine safety system that monitors the safety of vaccines. This demo organizes the experience around registration, short check-ins, and clear support information.
+              {t('home.aboutBody1')}
             </p>
             <p>
-              The assistant in this prototype helps users move through the site, find general V-safe information, and locate student vaccine requirement resources.
+              {t('home.aboutBody2')}
             </p>
           </div>
         </div>
@@ -222,7 +225,7 @@ export default function Home({ onOpenAuth, onOpenAssistant }: HomeProps) {
                 <h3 className="mt-5 text-2xl font-black text-slate-950">{item.title}</h3>
                 <p className="mt-4 text-base leading-7 text-slate-600">{item.body}</p>
                 <div className="mt-6 inline-flex items-center gap-2 text-sm font-black text-health-blue">
-                  Learn more
+                  {t('home.learnMore')}
                   <CalendarCheck2 className="h-4 w-4 transition group-hover:translate-x-1" />
                 </div>
               </Link>
