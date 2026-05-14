@@ -8,10 +8,13 @@ import { getHealthAssistantResponse } from '../../services/geminiService';
 import { findUniversityByQuery, formatUniversityVaccineGuidance, hasSchoolVaccineIntent } from '../../data/universities';
 import { useLanguage } from '../../i18n';
 import {
-  GENERAL_EXPECTATION_GUIDANCE,
-  SHINGLES_EXPECTATION_GUIDANCE,
+  formatGenericCollegeVaccineGuidance,
+  formatTravelVaccineGuidance,
+  getTravelCountry,
+  getVaccineExpectationGuidance,
+  hasCollegeVaccineRequirementIntent,
   hasFutureVaccineExpectationIntent,
-  isShinglesVaccineQuestion,
+  hasTravelVaccineIntent,
 } from '../../data/vaccineGuidance';
 
 interface Message {
@@ -227,36 +230,34 @@ function getAssistantIntent(message: string, currentPath: string): AssistantInte
   const normalized = message.toLowerCase();
   const matchedSchool = findUniversityByQuery(message);
 
-  if (matchedSchool) {
+  if (hasFutureVaccineExpectationIntent(message)) {
+    return {
+      response: getVaccineExpectationGuidance(message),
+      suggestions: ['Take me to sign up', 'What should I report after vaccination?'],
+      navigateTo: '/check-in',
+      navigateLabel: 'Sign up / Register',
+    };
+  }
+
+  if (hasTravelVaccineIntent(message)) {
+    const country = getTravelCountry(message);
+    return {
+      response: country ? formatTravelVaccineGuidance(country) : 'Which country are you asking about?',
+      suggestions: country ? ['Open CDC travel list', 'What is V-safe?'] : ['Brazil', 'Japan'],
+    };
+  }
+
+  if (matchedSchool && (hasCollegeVaccineRequirementIntent(message) || hasSchoolVaccineIntent(message))) {
     return {
       response: formatUniversityVaccineGuidance(matchedSchool),
       suggestions: ['Ask another school', 'Ask about SCAD Atlanta'],
     };
   }
 
-  if (hasSchoolVaccineIntent(message)) {
+  if (hasCollegeVaccineRequirementIntent(message) || hasSchoolVaccineIntent(message)) {
     return {
-      response: `I can help with school vaccine requirements, but I did not find a specific university match in this demo database.
-
-Please send the school name exactly as it appears, for example:
-- UCLA
-- MIT
-- SCAD
-- University of Michigan
-
-I will look for that school's official immunization page first and avoid guessing if it is not in the demo data.`,
-      suggestions: ['Ask about SCAD', 'Ask about UCLA'],
-    };
-  }
-
-  if (hasFutureVaccineExpectationIntent(message)) {
-    return {
-      response: isShinglesVaccineQuestion(message)
-        ? SHINGLES_EXPECTATION_GUIDANCE
-        : GENERAL_EXPECTATION_GUIDANCE,
-      suggestions: ['Take me to sign up', 'What should I report after vaccination?'],
-      navigateTo: '/check-in',
-      navigateLabel: 'Sign up / Register',
+      response: formatGenericCollegeVaccineGuidance(),
+      suggestions: ['Ask about NYU', 'Ask about UCLA'],
     };
   }
 

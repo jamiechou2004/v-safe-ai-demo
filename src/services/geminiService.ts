@@ -1,9 +1,14 @@
 import { findUniversityByQuery, formatUniversityVaccineGuidance, hasSchoolVaccineIntent } from '../data/universities';
 import {
-  GENERAL_EXPECTATION_GUIDANCE,
-  SHINGLES_EXPECTATION_GUIDANCE,
+  CURRENT_SYMPTOM_GUIDANCE,
+  formatGenericCollegeVaccineGuidance,
+  formatTravelVaccineGuidance,
+  getTravelCountry,
+  getVaccineExpectationGuidance,
+  hasCollegeVaccineRequirementIntent,
   hasFutureVaccineExpectationIntent,
-  isShinglesVaccineQuestion,
+  hasCurrentSymptomIntent,
+  hasTravelVaccineIntent,
 } from '../data/vaccineGuidance';
 
 const fallbackResponses = [
@@ -30,28 +35,27 @@ function chooseDemoResponse(message: string) {
   const normalized = message.toLowerCase();
   const matchedSchool = findUniversityByQuery(message);
 
-  if (matchedSchool) {
+  if (hasFutureVaccineExpectationIntent(message)) {
+    return getVaccineExpectationGuidance(message);
+  }
+
+  if (hasTravelVaccineIntent(message)) {
+    const country = getTravelCountry(message);
+    return country
+      ? formatTravelVaccineGuidance(country)
+      : 'Which country are you asking about?';
+  }
+
+  if (matchedSchool && (hasCollegeVaccineRequirementIntent(message) || hasSchoolVaccineIntent(message))) {
     return formatUniversityVaccineGuidance(matchedSchool);
   }
 
-  if (hasSchoolVaccineIntent(message)) {
-    return `I understand this is about school vaccine requirements, but I could not match a specific university in the demo database.
-
-Send the school name directly, such as "SCAD", "UCLA", "MIT", or "University of Michigan", and I will look for the official immunization page first.`;
+  if (hasCollegeVaccineRequirementIntent(message) || hasSchoolVaccineIntent(message)) {
+    return formatGenericCollegeVaccineGuidance();
   }
 
-  if (hasFutureVaccineExpectationIntent(message)) {
-    return isShinglesVaccineQuestion(message)
-      ? SHINGLES_EXPECTATION_GUIDANCE
-      : GENERAL_EXPECTATION_GUIDANCE;
-  }
-
-  if (normalized.includes('symptom') || normalized.includes('fever') || normalized.includes('headache') || normalized.includes('sore')) {
-    return `I can help you think through symptoms in a practical way.
-
-If you already received a vaccine, mild reactions such as a sore arm, headache, fatigue, chills, or a low fever can happen and often improve within a few days.
-
-You can use the check-in page to report how you feel. If symptoms are severe, unusual, or do not go away, contact a healthcare professional. For difficulty breathing, chest pain, or face/throat swelling, call 911 immediately.`;
+  if (hasCurrentSymptomIntent(message) || normalized.includes('symptom') || normalized.includes('fever') || normalized.includes('headache') || normalized.includes('sore')) {
+    return CURRENT_SYMPTOM_GUIDANCE;
   }
 
   if (normalized.includes('privacy') || normalized.includes('data') || normalized.includes('security')) {
