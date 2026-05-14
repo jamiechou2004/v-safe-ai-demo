@@ -1,4 +1,10 @@
 import { findUniversityByQuery, formatUniversityVaccineGuidance, hasSchoolVaccineIntent } from '../data/universities';
+import {
+  GENERAL_EXPECTATION_GUIDANCE,
+  SHINGLES_EXPECTATION_GUIDANCE,
+  hasFutureVaccineExpectationIntent,
+  isShinglesVaccineQuestion,
+} from '../data/vaccineGuidance';
 
 const fallbackResponses = [
   `I can help with that. This demo is built around the moments where people usually need a little direction: finding the right page, understanding V-safe, or checking vaccine requirement resources for school.
@@ -34,10 +40,16 @@ function chooseDemoResponse(message: string) {
 Send the school name directly, such as "SCAD", "UCLA", "MIT", or "University of Michigan", and I will look for the official immunization page first.`;
   }
 
-  if (normalized.includes('symptom') || normalized.includes('fever') || normalized.includes('headache') || normalized.includes('sore')) {
-    return `I am sorry you are dealing with symptoms. I can help you decide what to do in the demo and when to look for urgent help.
+  if (hasFutureVaccineExpectationIntent(message)) {
+    return isShinglesVaccineQuestion(message)
+      ? SHINGLES_EXPECTATION_GUIDANCE
+      : GENERAL_EXPECTATION_GUIDANCE;
+  }
 
-Mild symptoms like a sore arm, headache, fatigue, chills, or a low fever can happen after vaccination and often improve within 1-2 days.
+  if (normalized.includes('symptom') || normalized.includes('fever') || normalized.includes('headache') || normalized.includes('sore')) {
+    return `I can help you think through symptoms in a practical way.
+
+If you already received a vaccine, mild reactions such as a sore arm, headache, fatigue, chills, or a low fever can happen and often improve within a few days.
 
 You can use the check-in page to report how you feel. If symptoms are severe, unusual, or do not go away, contact a healthcare professional. For difficulty breathing, chest pain, or face/throat swelling, call 911 immediately.`;
   }

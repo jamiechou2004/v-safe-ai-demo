@@ -7,6 +7,12 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { getHealthAssistantResponse } from '../../services/geminiService';
 import { findUniversityByQuery, formatUniversityVaccineGuidance, hasSchoolVaccineIntent } from '../../data/universities';
 import { useLanguage } from '../../i18n';
+import {
+  GENERAL_EXPECTATION_GUIDANCE,
+  SHINGLES_EXPECTATION_GUIDANCE,
+  hasFutureVaccineExpectationIntent,
+  isShinglesVaccineQuestion,
+} from '../../data/vaccineGuidance';
 
 interface Message {
   id: string;
@@ -240,6 +246,17 @@ Please send the school name exactly as it appears, for example:
 
 I will look for that school's official immunization page first and avoid guessing if it is not in the demo data.`,
       suggestions: ['Ask about SCAD', 'Ask about UCLA'],
+    };
+  }
+
+  if (hasFutureVaccineExpectationIntent(message)) {
+    return {
+      response: isShinglesVaccineQuestion(message)
+        ? SHINGLES_EXPECTATION_GUIDANCE
+        : GENERAL_EXPECTATION_GUIDANCE,
+      suggestions: ['Take me to sign up', 'What should I report after vaccination?'],
+      navigateTo: '/check-in',
+      navigateLabel: 'Sign up / Register',
     };
   }
 
