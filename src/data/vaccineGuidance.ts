@@ -6,6 +6,14 @@ export function hasFutureVaccineExpectationIntent(message: string) {
   return futureTerms.some(term => normalized.includes(term)) && vaccineTerms.some(term => normalized.includes(term));
 }
 
+export type AssistantIntentLabel =
+  | 'vaccine_symptom_expectation'
+  | 'travel_health_symptoms'
+  | 'travel_vaccine_requirement'
+  | 'college_vaccine_requirement'
+  | 'post_vaccine_symptoms'
+  | 'general_vsafe_support';
+
 export function hasCurrentSymptomIntent(message: string) {
   const normalized = message.toLowerCase();
   const currentTerms = ['i have', 'i am having', "i'm having", 'experiencing', 'feel sick', 'feeling sick', 'after my vaccine', 'after getting', 'got my', 'yesterday', 'today', '现在', '已经', '感觉'];
@@ -104,6 +112,10 @@ export const CURRENT_SYMPTOM_GUIDANCE = `## What to do if you feel symptoms afte
 - **Call 911 right away** for difficulty breathing, face or throat swelling, chest pain, severe allergic reaction, dizziness/weakness, or hives.`;
 
 const knownTravelCountries: Record<string, { name: string; slug: string; notes?: string[] }> = {
+  argentina: {
+    name: 'Argentina',
+    slug: 'argentina',
+  },
   brazil: {
     name: 'Brazil',
     slug: 'brazil',
@@ -116,7 +128,11 @@ const knownTravelCountries: Record<string, { name: string; slug: string; notes?:
 
 export function getTravelCountry(message: string) {
   const normalized = message.toLowerCase();
-  const travelMatch = normalized.match(/travel(?:ing|ling)? to ([a-zA-Z\s-]+)/) || normalized.match(/going to ([a-zA-Z\s-]+)/);
+  const travelMatch =
+    normalized.match(/travel(?:ing|ling)? to ([a-zA-Z\s-]+)/) ||
+    normalized.match(/going to ([a-zA-Z\s-]+)/) ||
+    normalized.match(/visiting ([a-zA-Z\s-]+)/) ||
+    normalized.match(/trip to ([a-zA-Z\s-]+)/);
   const rawCountry = travelMatch?.[1]?.replace(/[?.!,].*$/, '').trim();
   const known = Object.values(knownTravelCountries).find(country => normalized.includes(country.name.toLowerCase()) || rawCountry === country.name.toLowerCase());
 
@@ -124,7 +140,10 @@ export function getTravelCountry(message: string) {
   if (!rawCountry) return null;
 
   const cleaned = rawCountry
+    .replace(/\b(next week|next month|soon|tomorrow|this week|this month|in \d+ weeks?|in \d+ months?).*$/, '')
     .replace(/\bwhat vaccines.*$/, '')
+    .replace(/\bwhat symptoms.*$/, '')
+    .replace(/\bdo i need.*$/, '')
     .replace(/\bfor travel.*$/, '')
     .trim();
 
@@ -137,6 +156,57 @@ export function hasTravelVaccineIntent(message: string) {
   const vaccineTerms = ['vaccine', 'vaccines', 'vaccination', 'required', 'requirements', 'entry', 'yellow fever', '疫苗', '入境'];
 
   return travelTerms.some(term => normalized.includes(term)) && vaccineTerms.some(term => normalized.includes(term));
+}
+
+export function hasTravelHealthSymptomIntent(message: string) {
+  const normalized = message.toLowerCase();
+  const travelTerms = ['travel', 'traveling', 'travelling', 'trip to', 'going to', 'visit', 'visiting', 'next week', 'next month', 'soon', '旅行', '去'];
+  const symptomTerms = ['symptom', 'symptoms', 'watch for', 'expect', 'illness', 'sick', 'fever', 'diarrhea', 'vomiting', 'rash', '症状', '生病', '发烧'];
+
+  return travelTerms.some(term => normalized.includes(term)) && symptomTerms.some(term => normalized.includes(term)) && Boolean(getTravelCountry(message));
+}
+
+export function formatTravelHealthSymptomGuidance(country: { name: string; slug?: string }) {
+  const countryLink = country.slug
+    ? `https://wwwnc.cdc.gov/travel/destinations/traveler/none/${country.slug}`
+    : 'https://wwwnc.cdc.gov/travel/destinations/list';
+
+  return `## Travel health symptoms for ${country.name}
+
+> For travel to ${country.name}, "symptoms" can mean two different things: side effects after travel vaccines, or illness symptoms to watch for while traveling or after you return.
+
+### A. Symptoms after travel vaccines
+- Sore arm, redness, or swelling where you got the shot.
+- Tiredness, headache, chills, mild fever, or muscle aches.
+- These symptoms are often mild and usually improve within **1-2 days**, depending on the vaccine and your health history.
+
+### B. Illness symptoms to watch for while traveling
+- Fever
+- Severe diarrhea or vomiting
+- Rash
+- Severe headache
+- Confusion
+- Symptoms after mosquito bites
+- Symptoms that are severe, persistent, or getting worse
+
+### When to get urgent medical help
+- Difficulty breathing
+- Chest pain
+- Face or throat swelling
+- Severe allergic reaction
+- Severe dehydration
+- Confusion
+- High fever
+- Severe or persistent symptoms
+
+### Official next steps
+- Check CDC Travelers Health for your destination: [CDC Travelers Health: ${country.name}](${countryLink})
+- If your trip is soon, contact a healthcare provider or travel clinic as soon as possible.
+- Bring your vaccine records, itinerary, activities, medications, and health conditions to the visit.
+- Requirements and outbreaks can change, so verify guidance with CDC Travelers Health, the destination country, your airline, or a travel clinic.
+
+### V-safe, if you receive a vaccine
+- V-safe is secondary here. If you get a vaccine and want to report how you feel afterward, you can use [V-safe](https://vsafe.cdc.gov/) to check in.`;
 }
 
 export function formatTravelVaccineGuidance(country: { name: string; slug?: string; notes?: string[] }) {
@@ -213,4 +283,13 @@ export function formatGenericCollegeVaccineGuidance(schoolName?: string) {
 - Search the school's official website for "student health immunization requirements."
 - Submit records before the deadline.
 - Contact student health services if you are unsure which records count.`;
+}
+
+export function classifyHealthQuestion(message: string): AssistantIntentLabel {
+  if (hasTravelHealthSymptomIntent(message)) return 'travel_health_symptoms';
+  if (hasFutureVaccineExpectationIntent(message)) return 'vaccine_symptom_expectation';
+  if (hasTravelVaccineIntent(message)) return 'travel_vaccine_requirement';
+  if (hasCollegeVaccineRequirementIntent(message)) return 'college_vaccine_requirement';
+  if (hasCurrentSymptomIntent(message)) return 'post_vaccine_symptoms';
+  return 'general_vsafe_support';
 }

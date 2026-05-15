@@ -9,11 +9,13 @@ import { findUniversityByQuery, formatUniversityVaccineGuidance, hasSchoolVaccin
 import { useLanguage } from '../../i18n';
 import {
   formatGenericCollegeVaccineGuidance,
+  formatTravelHealthSymptomGuidance,
   formatTravelVaccineGuidance,
   getTravelCountry,
   getVaccineExpectationGuidance,
   hasCollegeVaccineRequirementIntent,
   hasFutureVaccineExpectationIntent,
+  hasTravelHealthSymptomIntent,
   hasTravelVaccineIntent,
 } from '../../data/vaccineGuidance';
 
@@ -229,6 +231,14 @@ const ROUTE_RESPONSES: { path: string; label: string; keywords: string[] }[] = [
 function getAssistantIntent(message: string, currentPath: string): AssistantIntent | null {
   const normalized = message.toLowerCase();
   const matchedSchool = findUniversityByQuery(message);
+
+  if (hasTravelHealthSymptomIntent(message)) {
+    const country = getTravelCountry(message);
+    return {
+      response: country ? formatTravelHealthSymptomGuidance(country) : 'Which destination are you asking about?',
+      suggestions: country ? ['Open CDC travel list', 'What vaccines are required for travel?'] : ['Argentina', 'Brazil'],
+    };
+  }
 
   if (hasFutureVaccineExpectationIntent(message)) {
     return {

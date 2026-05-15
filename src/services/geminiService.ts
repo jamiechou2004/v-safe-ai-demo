@@ -2,12 +2,14 @@ import { findUniversityByQuery, formatUniversityVaccineGuidance, hasSchoolVaccin
 import {
   CURRENT_SYMPTOM_GUIDANCE,
   formatGenericCollegeVaccineGuidance,
+  formatTravelHealthSymptomGuidance,
   formatTravelVaccineGuidance,
   getTravelCountry,
   getVaccineExpectationGuidance,
   hasCollegeVaccineRequirementIntent,
   hasFutureVaccineExpectationIntent,
   hasCurrentSymptomIntent,
+  hasTravelHealthSymptomIntent,
   hasTravelVaccineIntent,
 } from '../data/vaccineGuidance';
 
@@ -34,6 +36,13 @@ You can ask about check-ins, V-safe basics, privacy, emergency guidance, or a un
 function chooseDemoResponse(message: string) {
   const normalized = message.toLowerCase();
   const matchedSchool = findUniversityByQuery(message);
+
+  if (hasTravelHealthSymptomIntent(message)) {
+    const country = getTravelCountry(message);
+    return country
+      ? formatTravelHealthSymptomGuidance(country)
+      : 'Which destination are you asking about?';
+  }
 
   if (hasFutureVaccineExpectationIntent(message)) {
     return getVaccineExpectationGuidance(message);
